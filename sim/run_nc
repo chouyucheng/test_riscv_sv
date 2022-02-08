@@ -1,0 +1,1 @@
+ncverilog -f filelist.f +nc64bit +access+r

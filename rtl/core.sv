@@ -40,11 +40,17 @@ logic [6:0]  funct7;
 logic [31:0] imm;
 
 // regfile
-logic [31:0] rs1_o;
-logic [31:0] rs2_o;
+logic [31:0] rf_rs1_o;
+logic [31:0] rf_rs2_o;
 logic        rf_rd_e;
 logic [4:0]  rf_rd_a;
 logic [31:0] rf_rd_i;
+
+// alu 
+logic [3:0]  alu_op;
+logic [31:0] alu_i1;
+logic [31:0] alu_i2;
+logic [31:0] alu_o;
 
 u_pc u_pc0(
 .clk  (clk ),
@@ -88,13 +94,22 @@ u_rf u_rf0(
 .clk   (clk        ),
 .rs1_a (rs1_a      ),
 .rs2_a (rs2_a_shamt),
-.rs1_o (rs1_o      ),
-.rs2_o (rs2_o      ),
+.rs1_o (rf_rs1_o   ),
+.rs2_o (rf_rs2_o   ),
 .rd_e  (rf_rd_e    ),
 .rd_a  (rf_rd_a    ),
 .rd_i  (rf_rd_i    )
 );
 
+
+u_alu u_alu0(
+.alu_op (alu_op),
+.alu_i1 (alu_i1),
+.alu_i2 (alu_i2),
+.alu_o  (alu_o ) 
+);
+
+    
 endmodule
 
 

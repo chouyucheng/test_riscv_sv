@@ -26,16 +26,16 @@ always_comb begin: alu_signed_input
 end
 
 always_comb begin: alu_output
-  alu_o = (alu_op==OP_ADD ) ? alu_i1 +   alu_i2      : 
-          (alu_op==OP_SUB ) ? alu_i1 -   alu_i2      : 
+  alu_o = (alu_op==OP_ADD ) ? alu_i1  +  alu_i2      : 
+          (alu_op==OP_SUB ) ? alu_i1  -  alu_i2      : 
           (alu_op==OP_SLL ) ? alu_i1 <<  alu_i2[4:0] : 
-          (alu_op==OP_SLT ) ? sig_i1 <   sig_i2      : 
-          (alu_op==OP_SLTU) ? alu_i1 <   alu_i2      : 
-          (alu_op==OP_XOR ) ? alu_i1 ^   alu_i2      : 
-          (alu_op==OP_SRL ) ? alu_i1 >>  alu_i2[4:0] : 
+          (alu_op==OP_SLT ) ? sig_i1  <  sig_i2      : 
+          (alu_op==OP_SLTU) ? alu_i1  <  alu_i2      : 
+          (alu_op==OP_XOR ) ? alu_i1  ^  alu_i2      : 
+          (alu_op==OP_SRL ) ? alu_i1  >> alu_i2[4:0] : 
           (alu_op==OP_SRA ) ? sig_i1 >>> alu_i2[4:0] : 
-          (alu_op==OP_OR  ) ? alu_i1 |   alu_i2      : 
-          (alu_op==OP_AND ) ? alu_i1 &   alu_i2      : 0; 
+          (alu_op==OP_OR  ) ? alu_i1  |  alu_i2      : 
+          (alu_op==OP_AND ) ? alu_i1  &  alu_i2      : 0; 
 end
 
 endmodule

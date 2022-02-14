@@ -52,13 +52,28 @@ logic reg_iCSR;
 logic [4:0]  reg_rs1_a;
 logic [4:0]  reg_rs2_a_shamt;
 logic [4:0]  reg_rd_a;
-logic [2:0]  reg_funct3;
-logic [6:0]  reg_funct7;
+logic [2:0]  reg_f3;
+logic [6:0]  reg_f7;
 logic [31:0] reg_imm;
 logic [31:0] reg_rs1_o;
 logic [31:0] reg_rs2_o;
 
-always@(posedge clk or negedge rstn) begin: input_reg
+// forwarding
+logic [31:0] fwd_o1;
+logic [31:0] fwd_o2;
+
+// write regfile buffer
+logic        buf0_we;
+logic  [4:0] buf0_a;
+logic [31:0] buf0_d;
+logic        buf1_we;
+logic  [4:0] buf1_a;
+logic [31:0] buf1_d;
+logic        buf2_we;
+logic  [4:0] buf2_a;
+logic [31:0] buf2_d;
+
+always_ff@(posedge clk or negedge rstn) begin: input_reg
   if(!rstn) begin
     reg_iLUI        <= 0;
     reg_iAUIPC      <= 0;
@@ -75,8 +90,8 @@ always@(posedge clk or negedge rstn) begin: input_reg
     reg_rs1_a       <= 0;
     reg_rs2_a_shamt <= 0;
     reg_rd_a        <= 0;
-    reg_funct3      <= 0;
-    reg_funct7      <= 0;
+    reg_f3          <= 0;
+    reg_f7          <= 0;
     reg_imm         <= 0;
     reg_rs1_o       <= 0;
     reg_rs2_o       <= 0;
@@ -96,20 +111,59 @@ always@(posedge clk or negedge rstn) begin: input_reg
     reg_rs1_a       <= rs1_a;
     reg_rs2_a_shamt <= rs2_a_shamt;
     reg_rd_a        <= rd_a;
-    reg_funct3      <= funct3;
-    reg_funct7      <= funct7;
+    reg_f3          <= funct3;
+    reg_f7          <= funct7;
     reg_imm         <= imm;
     reg_rs1_o       <= rf_rs1_o;
     reg_rs2_o       <= rf_rs2_o;
   end
 end
 
-always_comb begin: alu_ctrl
-  alu_op[2:0] = reg_funct3;
-  alu_op[3]   = (reg_iALU) | 
-                (reg_iALUi & reg_funct3==3'b101) ? reg_funct7[5] : 0; 
+always_comb begin: forwarding_ctrl
+  fwd_o1 =  reg_rs1_o;
+  fwd_o2 = (reg_iALUi & reg_f3==3'b001) | 
+           (reg_iALUi & reg_f3==3'b101) ? rs2_a_shamt :
+           (reg_iALUi)                  ? imm         : reg_rs2_o;
 end
 
+always_comb begin: alu_ctrl
+  alu_op[2:0] =  reg_f3;
+  alu_op[3]   = (reg_iALU) | 
+                (reg_iALUi & reg_f3==3'b101) ? reg_f7[5] : 0; 
+
+  alu_i1 = fwd_o1;
+  alu_i2 = fwd_o2; 
+end
+
+always_ff@(posedge clk or negedge rstn) begin: write_regfile_buffer
+  if(!rstn) begin
+    buf0_we <= 0;
+    buf0_a  <= 0;
+    buf0_d  <= 0;
+    buf1_we <= 0;
+    buf1_a  <= 0;
+    buf1_d  <= 0;
+    buf2_we <= 0;
+    buf2_a  <= 0;
+    buf2_d  <= 0;
+  end else begin
+    buf0_we <= (reg_iALU & reg_iALUi);
+    buf0_a  <= (reg_iALU & reg_iALUi) ? reg_rd_a : 0;
+    buf0_d  <= (reg_iALU & reg_iALUi) ? alu_o    : 0;
+    buf1_we <=  buf0_we;
+    buf1_a  <=  buf0_a;
+    buf1_d  <=  buf0_d;
+    buf2_we <=  buf1_we;
+    buf2_a  <=  buf1_a;
+    buf2_d  <=  buf1_d;
+  end
+end
+
+always_comb begin: write_regfile_ctrl
+  rf_rd_e = buf2_we;
+  rf_rd_a = buf2_a;
+  rf_rd_i = buf2_d; 
+end
 
 endmodule
 

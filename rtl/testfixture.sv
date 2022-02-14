@@ -81,6 +81,22 @@ initial begin: monitor_ins
   end
 end
 
+initial begin: monitor_regfile
+  integer i, j, fn;
+  i = 0;
+  fn = $fopen("regfile.txt","w");
+
+  #1;
+  @(posedge rstn);
+  forever begin
+    for(j=1;j<32;j=j+1) $fwrite(fn, "%h,", core0.u_rf0.rf_arr[j]);  
+    $fwrite(fn,"\n");
+    i=i+1;
+    @(posedge clk) #1;
+  end
+
+end
+
 initial begin: dump_fsdb
   $fsdbDumpfile("wave.fsdb");
   $fsdbDumpvars;
@@ -88,7 +104,7 @@ initial begin: dump_fsdb
 end 
 
 initial begin: WDT
-  #(1000 * 10);
+  #(100 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

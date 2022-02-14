@@ -109,6 +109,43 @@ u_alu u_alu0(
 .alu_o  (alu_o ) 
 );
 
+u_exe u_exe0 (
+.clk         (clk        ),
+.rstn        (rstn       ),
+// from dec
+.i_LUI       (i_LUI      ),
+.i_AUIPC     (i_AUIPC    ),
+.i_JAL       (i_JAL      ),
+.i_JALR      (i_JALR     ),
+.i_B         (i_B        ),
+.i_LD        (i_LD       ),
+.i_ST        (i_ST       ),
+.i_ALUi      (i_ALUi     ),
+.i_ALU       (i_ALU      ),
+.i_F         (i_F        ),
+.i_E         (i_E        ),
+.i_CSR       (i_CSR      ),
+.rs1_a       (rs1_a      ),
+.rs2_a_shamt (rs2_a_shamt),
+.rd_a        (rd_a       ),
+.funct3      (funct3     ),
+.funct7      (funct7     ),
+.imm         (imm        ),
+// rf
+.rf_rs1_o    (rf_rs1_o   ),
+.rf_rs2_o    (rf_rs2_o   ),
+.rf_rd_e     (rf_rd_e    ),
+.rf_rd_a     (rf_rd_a    ),
+.rf_rd_i     (rf_rd_i    ),
+// alu
+.alu_op      (alu_op     ),
+.alu_i1      (alu_i1     ),
+.alu_i2      (alu_i2     ),
+.alu_o       (alu_o      )
+// csr
+
+// lsu
+);
     
 endmodule
 

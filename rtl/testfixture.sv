@@ -83,14 +83,21 @@ end
 
 initial begin: monitor_regfile
   integer i, j, fn;
+  integer rf_rd_e, rf_rd_a; 
   i = 0;
+  rf_rd_e = 0;
   fn = $fopen("regfile.txt","w");
 
   #1;
   @(posedge rstn);
   forever begin
-    for(j=1;j<32;j=j+1) $fwrite(fn, "%h,", core0.u_rf0.rf_arr[j]);  
+    $fwrite(fn, "cycle %d,",i[15:0]);
+    if(rf_rd_e) 
+      $fwrite(fn, "a:%h, d:%h", rf_rd_a, core0.u_rf0.rf_arr[rf_rd_a]);  
     $fwrite(fn,"\n");
+
+    rf_rd_e = core0.u_rf0.rd_e;
+    rf_rd_a = core0.u_rf0.rd_a;
     i=i+1;
     @(posedge clk) #1;
   end

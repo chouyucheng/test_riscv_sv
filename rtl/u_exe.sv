@@ -147,9 +147,9 @@ always_ff@(posedge clk or negedge rstn) begin: write_regfile_buffer
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    buf0_we <= (reg_iALU & reg_iALUi);
-    buf0_a  <= (reg_iALU & reg_iALUi) ? reg_rd_a : 0;
-    buf0_d  <= (reg_iALU & reg_iALUi) ? alu_o    : 0;
+    buf0_we <= (reg_iALU | reg_iALUi);
+    buf0_a  <= (reg_iALU | reg_iALUi) ? reg_rd_a : 0;
+    buf0_d  <= (reg_iALU | reg_iALUi) ? alu_o    : 0;
     buf1_we <=  buf0_we;
     buf1_a  <=  buf0_a;
     buf1_d  <=  buf0_d;

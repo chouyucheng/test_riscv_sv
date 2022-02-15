@@ -1,3 +1,4 @@
 /sim/*
 !/sim/run_nc
 !/sim/filelist.f
+!/sim/*.txt

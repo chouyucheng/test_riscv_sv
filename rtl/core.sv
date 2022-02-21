@@ -13,11 +13,9 @@ output [3:0]   dat_re,
 input  [31:0]  dat_rd
 );
 
-// program counter
-logic [31:0] pc;
-
-// instruction fetch 
-logic [31:0] ins_reg;
+// instruction fetch unit 
+logic [31:0] ifu_pc;
+logic [31:0] ifu_ins;
 
 // decoder
 logic i_LUI;
@@ -52,24 +50,18 @@ logic [31:0] alu_i1;
 logic [31:0] alu_i2;
 logic [31:0] alu_o;
 
-u_pc u_pc0(
-.clk  (clk ),
-.rstn (rstn),
-.pc   (pc  )
-);
-
 u_ifu u_ifu0(
 .clk     (clk    ),
 .rstn    (rstn   ),
-.pc      (pc     ),
 .ins_a   (ins_a  ),
 .ins_e   (ins_e  ),
 .ins     (ins    ),
-.ins_reg (ins_reg) 
+.ifu_pc  (ifu_pc ),
+.ifu_ins (ifu_ins) 
 );
 
 u_dec u_dec0(
-.ins         (ins_reg    ),
+.ins         (ifu_ins    ),
 .i_LUI       (i_LUI      ),
 .i_AUIPC     (i_AUIPC    ),
 .i_JAL       (i_JAL      ),

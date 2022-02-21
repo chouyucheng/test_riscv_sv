@@ -74,8 +74,10 @@ initial begin: monitor_ins
   #1;
   @(posedge rstn);
   repeat(10) begin
-      $display("cycle %d, pc: %h, ins: %h, ALUi: %b", 
-                i, core0.pc, core0.ins_reg, core0.i_ALUi);
+//      $display("cycle %d, pc: %h, ins: %h, ALUi: %b", 
+//                i, core0.ifu_pc, core0.ifu_ins, core0.i_ALUi);
+      $display("cycle %d, pc: %h, ins: %h, ifu_ins: %h", 
+                i, core0.u_ifu0.pc, core0.ins, core0.ifu_ins);
       i=i+1;
       @(posedge clk) #1;
   end
@@ -83,8 +85,8 @@ end
 
 initial begin: monitor_instruction
   integer fn;
-  integer pc1,  pc2,  pc3,  pc4,  pc5,  pc6;
   integer vld1, vld2, vld3, vld4, vld5, vld6;
+  integer       pc2,  pc3,  pc4,  pc5,  pc6;
   integer       ins2, ins3, ins4, ins5, ins6;
 
   fn = $fopen("do_ins.txt","w");
@@ -93,14 +95,13 @@ initial begin: monitor_instruction
 
   #1;
   @(posedge rstn) fork
-    forever @(posedge clk) begin: pipe1_pc
-      pc1  <= core0.pc;
+    forever @(posedge clk) begin: pipe1_pc_out
       vld1 <= 1;
     end
-    forever @(posedge clk) begin: pipe2_ins
+    forever @(posedge clk) begin: pipe2_ins_out
       vld2 <= vld1;
-      pc2  <= pc1;
-      ins2 <= core0.ins_reg;
+      pc2  <= core0.ifu_pc;
+      ins2 <= core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe3_exe
       pc3  <= pc2;

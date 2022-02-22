@@ -36,15 +36,21 @@ initial begin: sram0_model
   $readmemh("../../test_compile/prog0/sram_0_1.hex", sram0_1);
   $readmemh("../../test_compile/prog0/sram_0_2.hex", sram0_2);
   $readmemh("../../test_compile/prog0/sram_0_3.hex", sram0_3);
-  forever@(posedge clk) begin
-    sram0_a = ins_a[15:2];
-    sram0_e = ins_e;
-    if(sram0_e) sram0_o[ 0+:8] = sram0_0[sram0_a];
-    if(sram0_e) sram0_o[ 8+:8] = sram0_1[sram0_a];
-    if(sram0_e) sram0_o[16+:8] = sram0_2[sram0_a];
-    if(sram0_e) sram0_o[24+:8] = sram0_3[sram0_a];
-    ins = sram0_o;
-  end
+  ins = 0;
+
+  @(posedge rstn) fork
+    forever@(posedge clk) begin
+      sram0_a <= ins_a[15:2];
+      sram0_e <= ins_e;
+    end
+    forever@(*) begin
+      if(sram0_e) sram0_o[ 0+:8] = sram0_0[sram0_a];
+      if(sram0_e) sram0_o[ 8+:8] = sram0_1[sram0_a];
+      if(sram0_e) sram0_o[16+:8] = sram0_2[sram0_a];
+      if(sram0_e) sram0_o[24+:8] = sram0_3[sram0_a];
+      ins = sram0_o;
+    end
+  join
 end
 
 initial begin: sram1_model
@@ -74,10 +80,8 @@ initial begin: monitor_ins
   #1;
   @(posedge rstn);
   repeat(10) begin
-//      $display("cycle %d, pc: %h, ins: %h, ALUi: %b", 
-//                i, core0.ifu_pc, core0.ifu_ins, core0.i_ALUi);
-      $display("cycle %d, pc: %h, ins: %h, ifu_ins: %h", 
-                i, core0.u_ifu0.pc, core0.ins, core0.ifu_ins);
+      $display("cycle %d, pc: %h, ifu_ins: %h, exe_buf0_we: %b, rf_rd_e: %b",
+                i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
       i=i+1;
       @(posedge clk) #1;
   end
@@ -85,12 +89,12 @@ end
 
 initial begin: monitor_instruction
   integer fn;
-  integer vld1, vld2, vld3, vld4, vld5, vld6;
-  integer       pc2,  pc3,  pc4,  pc5,  pc6;
-  integer       ins2, ins3, ins4, ins5, ins6;
+  integer vld1, vld2, vld3, vld4, vld5, vld6, vld7;
+  integer             pc3,  pc4,  pc5,  pc6,  pc7;
+  integer             ins3, ins4, ins5, ins6, ins7;
 
   fn = $fopen("do_ins.txt","w");
-  vld1=0;vld2=0;vld3=0;vld4=0;vld5=0;vld6=0;
+  vld1=0;vld2=0;vld3=0;vld4=0;vld5=0;vld6=0;vld7=0;
   
 
   #1;
@@ -98,35 +102,38 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: pipe1_pc_out
       vld1 <= 1;
     end
-    forever @(posedge clk) begin: pipe2_ins_out
+    forever @(posedge clk) begin: pipe2_ins_mem_out
       vld2 <= vld1;
-      pc2  <= core0.ifu_pc;
-      ins2 <= core0.ifu_ins;
+    end
+    forever @(posedge clk) begin: pipe3_ins_reg_out
+      vld3 <= vld2;
+      pc3  <= core0.ifu_pc;
+      ins3 <= core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe3_exe
-      pc3  <= pc2;
-      vld3 <= vld2;
-      ins3 <= ins2;
-    end
-    forever @(posedge clk) begin: pipe4_csr
-      pc4  <= pc3;
       vld4 <= vld3;
+      pc4  <= pc3;
       ins4 <= ins3;
     end
-    forever @(posedge clk) begin: pipe5_lsu
-      pc5  <= pc4;
+    forever @(posedge clk) begin: pipe4_csr
       vld5 <= vld4;
+      pc5  <= pc4;
       ins5 <= ins4;
     end
-    forever @(posedge clk) begin: pipe6_commit
-      pc6  <= pc5;
+    forever @(posedge clk) begin: pipe5_lsu
       vld6 <= vld5;
+      pc6  <= pc5;
       ins6 <= ins5;
     end
+    forever @(posedge clk) begin: pipe6_commit
+      vld7 <= vld6;
+      pc7  <= pc6;
+      ins7 <= ins6;
+    end
     forever @(posedge clk) begin: output_instructin 
-      if(vld6) begin 
-        $fwrite(fn, "%h ", pc6);
-        fwrite_instruction(fn, ins6);
+      if(vld7) begin 
+        $fwrite(fn, "%h ", pc7);
+        fwrite_instruction(fn, ins7);
         $fwrite(fn, "\n");
       end
     end
@@ -161,11 +168,19 @@ input [31:0] ins
   uimm        = {    ins[31],  ins[30:20],ins[19:12],                     12'b0};
   jimm        = {{11{ins[31]}},ins[19:12],ins[20],   ins[30:25],ins[24:21],1'b0};
 
+  if(opcode==7'b0010111) begin
+    $fwrite(fn, "AUIPC, ");
+    fw_reg_name(fn, rd_a);
+    $fwrite(fn, "pc, ");
+    $fwrite(fn, "0x%h, ", uimm);
+    $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
+  end
   if(opcode==7'b0010011) begin
-    if(funct3==3'b000) $fwrite(fn, "addi, ");
+    if(funct3==3'b000) $fwrite(fn, "ADDI,  ");
     fw_reg_name(fn, rd_a);
     fw_reg_name(fn, rs1_a);
-    $fwrite(fn, "0x%0h", iimm);
+    $fwrite(fn, "0x%h, ", iimm);
+    $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
   end
 end endtask
 

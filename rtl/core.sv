@@ -104,7 +104,9 @@ u_alu u_alu0(
 u_exe u_exe0 (
 .clk         (clk        ),
 .rstn        (rstn       ),
-// from dec
+// ifu
+.pc          (ifu_pc     ),
+// dec
 .i_LUI       (i_LUI      ),
 .i_AUIPC     (i_AUIPC    ),
 .i_JAL       (i_JAL      ),

@@ -126,10 +126,10 @@ end
 
 always_comb begin: forwarding_ctrl
   fwd_o1 = (reg_iAUIPC) ? reg_pc : reg_rs1_o;
-  fwd_o2 = (reg_iAUIPC)                 ? imm         :
+  fwd_o2 = (reg_iAUIPC)                 ? reg_imm     :
            (reg_iALUi & reg_f3==3'b001) | 
            (reg_iALUi & reg_f3==3'b101) ? rs2_a_shamt :
-           (reg_iALUi)                  ? imm         : reg_rs2_o;
+           (reg_iALUi)                  ? reg_imm     : reg_rs2_o;
 end
 
 always_comb begin: alu_ctrl

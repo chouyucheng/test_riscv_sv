@@ -75,15 +75,21 @@ core core0(
 
 initial begin: monitor_ins
   integer i;
-  i = 0;
+  i = 1;
 
   #1;
   @(posedge rstn);
+  repeat(30) begin
+    i=i+1;
+    @(posedge clk) #1;
+  end
   repeat(10) begin
-      $display("cycle %d, pc: %h, ifu_ins: %h, exe_buf0_we: %b, rf_rd_e: %b",
-                i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
-      i=i+1;
-      @(posedge clk) #1;
+//    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
+//              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
+    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
+              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.reg_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
+    i=i+1;
+    @(posedge clk) #1;
   end
 end
 

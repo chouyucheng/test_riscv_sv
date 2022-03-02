@@ -4,4 +4,5 @@
 ../rtl/u_dec.sv
 ../rtl/u_rf.sv
 ../rtl/u_exe.sv
+../rtl/u_br_adr.sv
 ../rtl/u_alu.sv

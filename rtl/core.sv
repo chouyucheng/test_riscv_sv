@@ -44,6 +44,12 @@ logic        rf_rd_e;
 logic [4:0]  rf_rd_a;
 logic [31:0] rf_rd_i;
 
+// branch address
+logic [31:0] br_adr_i1;
+logic [31:0] br_adr_i2;
+logic [31:0] br_adr_o;
+
+
 // alu 
 logic [3:0]  alu_op;
 logic [31:0] alu_i1;
@@ -93,14 +99,6 @@ u_rf u_rf0(
 .rd_i  (rf_rd_i    )
 );
 
-
-u_alu u_alu0(
-.alu_op (alu_op),
-.alu_i1 (alu_i1),
-.alu_i2 (alu_i2),
-.alu_o  (alu_o ) 
-);
-
 u_exe u_exe0 (
 .clk         (clk        ),
 .rstn        (rstn       ),
@@ -131,6 +129,9 @@ u_exe u_exe0 (
 .rf_rd_e     (rf_rd_e    ),
 .rf_rd_a     (rf_rd_a    ),
 .rf_rd_i     (rf_rd_i    ),
+// br_adr
+.br_adr_i1   (br_adr_i1  ),
+.br_adr_i2   (br_adr_i2  ),
 // alu
 .alu_op      (alu_op     ),
 .alu_i1      (alu_i1     ),
@@ -139,6 +140,19 @@ u_exe u_exe0 (
 // csr
 
 // lsu
+);
+
+u_br_adr u_br_adr0(
+.br_adr_i1 (br_adr_i1),
+.br_adr_i2 (br_adr_i2),
+.br_adr_o  (br_adr_o )        
+);
+
+u_alu u_alu0(
+.alu_op (alu_op),
+.alu_i1 (alu_i1),
+.alu_i2 (alu_i2),
+.alu_o  (alu_o ) 
 );
     
 endmodule

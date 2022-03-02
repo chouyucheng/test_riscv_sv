@@ -28,6 +28,9 @@ input        [31:0] rf_rs2_o,
 output logic        rf_rd_e,
 output logic [4:0]  rf_rd_a,
 output logic [31:0] rf_rd_i,
+// br_adr
+output logic [31:0] br_adr_i1,
+output logic [31:0] br_adr_i2,
 // alu
 output logic [3:0]  alu_op,
 output logic [31:0] alu_i1,
@@ -125,11 +128,18 @@ always_ff@(posedge clk or negedge rstn) begin: input_reg
 end
 
 always_comb begin: forwarding_ctrl
-  fwd_o1 = (reg_iAUIPC) ? reg_pc : reg_rs1_o;
+  fwd_o1 = (reg_iAUIPC) ? reg_pc : 
+           (reg_iJAL)   ? reg_pc : reg_rs1_o;
   fwd_o2 = (reg_iAUIPC)                 ? reg_imm     :
+           (reg_iJAL)                   ? 32'd4       : 
            (reg_iALUi & reg_f3==3'b001) | 
            (reg_iALUi & reg_f3==3'b101) ? rs2_a_shamt :
            (reg_iALUi)                  ? reg_imm     : reg_rs2_o;
+end
+
+always_comb begin: branch_adr_ctrl
+  br_adr_i1 = reg_pc;
+  br_adr_i2 = reg_imm;
 end
 
 always_comb begin: alu_ctrl

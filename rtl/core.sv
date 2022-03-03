@@ -44,6 +44,9 @@ logic        rf_rd_e;
 logic [4:0]  rf_rd_a;
 logic [31:0] rf_rd_i;
 
+// branch control
+logic branch;
+
 // branch address
 logic [31:0] br_adr_i1;
 logic [31:0] br_adr_i2;
@@ -57,13 +60,15 @@ logic [31:0] alu_i2;
 logic [31:0] alu_o;
 
 u_ifu u_ifu0(
-.clk     (clk    ),
-.rstn    (rstn   ),
-.ins_a   (ins_a  ),
-.ins_e   (ins_e  ),
-.ins     (ins    ),
-.ifu_pc  (ifu_pc ),
-.ifu_ins (ifu_ins) 
+.clk     (clk     ),
+.rstn    (rstn    ),
+.branch  (branch  ),
+.br_adr  (br_adr_o),
+.ins_a   (ins_a   ),
+.ins_e   (ins_e   ),
+.ins     (ins     ),
+.ifu_pc  (ifu_pc  ),
+.ifu_ins (ifu_ins ) 
 );
 
 u_dec u_dec0(
@@ -129,6 +134,8 @@ u_exe u_exe0 (
 .rf_rd_e     (rf_rd_e    ),
 .rf_rd_a     (rf_rd_a    ),
 .rf_rd_i     (rf_rd_i    ),
+// br_ctrl
+.branch      (branch     ),
 // br_adr
 .br_adr_i1   (br_adr_i1  ),
 .br_adr_i2   (br_adr_i2  ),

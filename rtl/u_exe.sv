@@ -28,6 +28,8 @@ input        [31:0] rf_rs2_o,
 output logic        rf_rd_e,
 output logic [4:0]  rf_rd_a,
 output logic [31:0] rf_rd_i,
+// br_ctrl
+output logic        branch,
 // br_adr
 output logic [31:0] br_adr_i1,
 output logic [31:0] br_adr_i2,
@@ -135,6 +137,10 @@ always_comb begin: forwarding_ctrl
            (reg_iALUi & reg_f3==3'b001) | 
            (reg_iALUi & reg_f3==3'b101) ? rs2_a_shamt :
            (reg_iALUi)                  ? reg_imm     : reg_rs2_o;
+end
+
+always_comb begin: branch_ctrl
+  branch = (reg_iJAL);
 end
 
 always_comb begin: branch_adr_ctrl

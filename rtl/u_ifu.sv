@@ -1,6 +1,9 @@
 module u_ifu (
 input clk,
 input rstn,
+// branch
+input        branch,
+input [31:0] br_adr,
 // sram 0
 output logic [15:0] ins_a,
 output              ins_e,
@@ -15,7 +18,7 @@ logic [31:0] pc_d1;
 
 always_ff@(posedge clk or negedge rstn) begin: p1_reg_pc
   if(!rstn) pc <= 0;
-  else      pc <= pc + 4;
+  else      pc <= branch ? br_adr : pc + 4;
 end
 
 assign ins_e = 1;

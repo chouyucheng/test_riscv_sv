@@ -181,6 +181,13 @@ input [31:0] ins
     $fwrite(fn, "0x%h, ", uimm);
     $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
   end
+  if(opcode==7'b1101111) begin
+    $fwrite(fn, "JAL,   ");
+    fw_reg_name(fn, rd_a);
+    $fwrite(fn,"    ");
+    $fwrite(fn, "0x%h, ", jimm);
+    $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
+  end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");
     fw_reg_name(fn, rd_a);

@@ -36,56 +36,32 @@
 0000008c AUIPC, a1, pc, 0x00011000, rd:0x0001108c
 00000090 ADDI,  a1, a1, 0xffffff70, rd:0xffffff70
 00000094 ADDI,  a2, z0, 0x00000000, rd:0x00000000
-00000098 JAL,   ra,     0x00000094, rd:0x00000000
-0000009c AUIPC, a0, pc, 0x00011000, rd:0x0001109c
-000000a0 ADDI,  a0, a0, 0xffffff64, rd:0xfffffee0
-000000a4 AUIPC, a1, pc, 0x00011000, rd:0x000110a4
+00000098 JAL,   ra,     0x00000094, rd:0x0000009c
 0000012c 
 00000130 
-00000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffee4
+00000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff80
 00000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-0000013c 
-00000140 ADDI,  sp, sp, 0xfffffffc, rd:0xfffffffc
-00000144 
 8000012c 
 80000130 
-80000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffee8
+80000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff84
 80000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-8000013c 
-80000140 ADDI,  sp, sp, 0xfffffffc, rd:0xfffffff8
-80000144 
 0000012c 
 00000130 
-00000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffeec
+00000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff88
 00000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-0000013c 
-00000140 ADDI,  sp, sp, 0xfffffffc, rd:0xfffffff4
-00000144 
 8000012c 
 80000130 
-80000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffef0
+80000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff8c
 80000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-8000013c 
-80000140 ADDI,  sp, sp, 0xfffffffc, rd:0xfffffff0
-80000144 
 0000012c 
 00000130 
-00000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffef4
+00000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff90
 00000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-0000013c 
-00000140 ADDI,  sp, sp, 0xfffffffc, rd:0xffffffec
-00000144 
 8000012c 
 80000130 
-80000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffef8
+80000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff94
 80000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-8000013c 
-80000140 ADDI,  sp, sp, 0xfffffffc, rd:0xffffffe8
-80000144 
 0000012c 
 00000130 
-00000134 ADDI,  a0, a0, 0x00000004, rd:0xfffffefc
+00000134 ADDI,  a0, a0, 0x00000004, rd:0xffffff98
 00000138 JAL,   z0,     0x7ffffff4, rd:0xxxxxxxxx
-0000013c 
-00000140 ADDI,  sp, sp, 0xfffffffc, rd:0xffffffe4
-00000144 

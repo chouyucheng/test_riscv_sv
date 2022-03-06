@@ -95,24 +95,22 @@ end
 
 initial begin: monitor_instruction
   integer fn;
-  integer vld1, vld2, vld3, vld4, vld5, vld6, vld7;
-  integer             pc3,  pc4,  pc5,  pc6,  pc7;
-  integer             ins3, ins4, ins5, ins6, ins7;
+  integer vld3, vld4, vld5, vld6, vld7;
+  integer pc3,  pc4,  pc5,  pc6,  pc7;
+  integer ins3, ins4, ins5, ins6, ins7;
 
   fn = $fopen("do_ins.txt","w");
-  vld1=0;vld2=0;vld3=0;vld4=0;vld5=0;vld6=0;vld7=0;
+  vld3=0;vld4=0;vld5=0;vld6=0;vld7=0;
   
 
   #1;
   @(posedge rstn) fork
     forever @(posedge clk) begin: pipe1_pc_out
-      vld1 <= 1;
     end
     forever @(posedge clk) begin: pipe2_ins_mem_out
-      vld2 <= vld1;
     end
     forever @(posedge clk) begin: pipe3_ins_reg_out
-      vld3 <= vld2;
+      vld3 <= core0.ifu_en & !core0.branch;
       pc3  <= core0.ifu_pc;
       ins3 <= core0.ifu_ins;
     end

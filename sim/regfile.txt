@@ -43,57 +43,57 @@ cycle    41,a:0000000a, d:ffffff7c
 cycle    42,a:0000000b, d:0001108c
 cycle    43,a:0000000b, d:ffffff70
 cycle    44,a:0000000c, d:00000000
-cycle    45,
-cycle    46,a:0000000a, d:0001109c
-cycle    47,a:0000000a, d:fffffee0
-cycle    48,a:0000000b, d:000110a4
+cycle    45,a:00000001, d:0000009c
+cycle    46,
+cycle    47,
+cycle    48,
 cycle    49,
 cycle    50,
-cycle    51,a:0000000a, d:fffffee4
-cycle    52,
+cycle    51,a:0000000a, d:ffffff80
+cycle    52,a:00000000, d:xxxxxxxx
 cycle    53,
-cycle    54,a:00000002, d:fffffffc
+cycle    54,
 cycle    55,
 cycle    56,
 cycle    57,
-cycle    58,a:0000000a, d:fffffee8
-cycle    59,
+cycle    58,a:0000000a, d:ffffff84
+cycle    59,a:00000000, d:xxxxxxxx
 cycle    60,
-cycle    61,a:00000002, d:fffffff8
+cycle    61,
 cycle    62,
 cycle    63,
 cycle    64,
-cycle    65,a:0000000a, d:fffffeec
-cycle    66,
+cycle    65,a:0000000a, d:ffffff88
+cycle    66,a:00000000, d:xxxxxxxx
 cycle    67,
-cycle    68,a:00000002, d:fffffff4
+cycle    68,
 cycle    69,
 cycle    70,
 cycle    71,
-cycle    72,a:0000000a, d:fffffef0
-cycle    73,
+cycle    72,a:0000000a, d:ffffff8c
+cycle    73,a:00000000, d:xxxxxxxx
 cycle    74,
-cycle    75,a:00000002, d:fffffff0
+cycle    75,
 cycle    76,
 cycle    77,
 cycle    78,
-cycle    79,a:0000000a, d:fffffef4
-cycle    80,
+cycle    79,a:0000000a, d:ffffff90
+cycle    80,a:00000000, d:xxxxxxxx
 cycle    81,
-cycle    82,a:00000002, d:ffffffec
+cycle    82,
 cycle    83,
 cycle    84,
 cycle    85,
-cycle    86,a:0000000a, d:fffffef8
-cycle    87,
+cycle    86,a:0000000a, d:ffffff94
+cycle    87,a:00000000, d:xxxxxxxx
 cycle    88,
-cycle    89,a:00000002, d:ffffffe8
+cycle    89,
 cycle    90,
 cycle    91,
 cycle    92,
-cycle    93,a:0000000a, d:fffffefc
-cycle    94,
+cycle    93,a:0000000a, d:ffffff98
+cycle    94,a:00000000, d:xxxxxxxx
 cycle    95,
-cycle    96,a:00000002, d:ffffffe4
+cycle    96,
 cycle    97,
 cycle    98,

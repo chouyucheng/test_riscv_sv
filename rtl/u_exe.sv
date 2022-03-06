@@ -28,6 +28,8 @@ input        [31:0] rf_rs2_o,
 output logic        rf_rd_e,
 output logic [4:0]  rf_rd_a,
 output logic [31:0] rf_rd_i,
+// hazard
+input flush0,
 // br_ctrl
 output logic        branch,
 // br_adr
@@ -104,6 +106,19 @@ always_ff@(posedge clk or negedge rstn) begin: input_reg
     reg_imm         <= 0;
     reg_rs1_o       <= 0;
     reg_rs2_o       <= 0;
+  end else if(flush0) begin
+    reg_iLUI        <= 0; 
+    reg_iAUIPC      <= 0; 
+    reg_iJAL        <= 0; 
+    reg_iJALR       <= 0; 
+    reg_iB          <= 0; 
+    reg_iLD         <= 0; 
+    reg_iST         <= 0; 
+    reg_iALUi       <= 0; 
+    reg_iALU        <= 0; 
+    reg_iF          <= 0; 
+    reg_iE          <= 0; 
+    reg_iCSR        <= 0; 
   end else begin
     reg_pc          <= pc;
     reg_iLUI        <= i_LUI;
@@ -169,9 +184,9 @@ always_ff@(posedge clk or negedge rstn) begin: write_regfile_buffer
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    buf0_we <= (reg_iAUIPC | reg_iALU | reg_iALUi);
-    buf0_a  <= (reg_iAUIPC | reg_iALU | reg_iALUi) ? reg_rd_a : 0;
-    buf0_d  <= (reg_iAUIPC | reg_iALU | reg_iALUi) ? alu_o    : 0;
+    buf0_we <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi);
+    buf0_a  <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi) ? reg_rd_a : 0;
+    buf0_d  <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi) ? alu_o    : 0;
     buf1_we <=  buf0_we;
     buf1_a  <=  buf0_a;
     buf1_d  <=  buf0_d;

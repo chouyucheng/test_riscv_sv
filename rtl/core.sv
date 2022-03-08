@@ -63,6 +63,8 @@ logic [3:0]  alu_op;
 logic [31:0] alu_i1;
 logic [31:0] alu_i2;
 logic [31:0] alu_o;
+logic        alu_lt;
+logic        alu_ltu;
 
 u_ifu u_ifu0(
 .clk     (clk     ),
@@ -159,7 +161,9 @@ u_exe u_exe0 (
 .alu_op      (alu_op     ),
 .alu_i1      (alu_i1     ),
 .alu_i2      (alu_i2     ),
-.alu_o       (alu_o      )
+.alu_o       (alu_o      ), 
+.alu_lt      (alu_lt     ),
+.alu_ltu     (alu_ltu    )
 // csr
 
 // lsu
@@ -172,10 +176,12 @@ u_br_adr u_br_adr0(
 );
 
 u_alu u_alu0(
-.alu_op (alu_op),
-.alu_i1 (alu_i1),
-.alu_i2 (alu_i2),
-.alu_o  (alu_o ) 
+.alu_op  (alu_op ),
+.alu_i1  (alu_i1 ),
+.alu_i2  (alu_i2 ),
+.alu_o   (alu_o  ), 
+.alu_lt  (alu_lt ),
+.alu_ltu (alu_ltu)
 );
     
 endmodule

@@ -39,7 +39,9 @@ output logic [31:0] br_adr_i2,
 output logic [3:0]  alu_op,
 output logic [31:0] alu_i1,
 output logic [31:0] alu_i2,
-input        [31:0] alu_o
+input        [31:0] alu_o,
+input               alu_lt,
+input               alu_ltu
 // csr
 
 // lsu

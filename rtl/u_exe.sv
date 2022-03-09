@@ -157,7 +157,8 @@ always_comb begin: forwarding_ctrl
 end
 
 always_comb begin: branch_ctrl
-  branch = (reg_iJAL);
+  branch = (reg_iJAL) | 
+           (reg_iB & reg_f3==3'b110 & alu_ltu);
 end
 
 always_comb begin: branch_adr_ctrl

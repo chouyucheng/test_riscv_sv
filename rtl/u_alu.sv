@@ -28,8 +28,8 @@ always_comb begin: unsigned_to_signed
 end
 
 always_comb begin: less_than
-  alu_lt  = (alu_op==OP_SLT ) & (sig_i1 < sig_i2); 
-  alu_ltu = (alu_op==OP_SLTU) & (alu_i1 < alu_i2); 
+  alu_lt  = (sig_i1 < sig_i2); 
+  alu_ltu = (alu_i1 < alu_i2); 
 end
 
 always_comb begin: alu_output

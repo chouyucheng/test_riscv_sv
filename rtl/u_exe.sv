@@ -62,7 +62,7 @@ logic        reg_iF;
 logic        reg_iE;
 logic        reg_iCSR;
 logic [4:0]  reg_rs1_a;
-logic [4:0]  reg_rs2_a_shamt;
+logic [4:0]  reg_rs2_a_sht;
 logic [4:0]  reg_rd_a;
 logic [2:0]  reg_f3;
 logic [6:0]  reg_f7;
@@ -87,73 +87,73 @@ logic [31:0] buf2_d;
 
 always_ff@(posedge clk or negedge rstn) begin: input_reg
   if(!rstn) begin
-    reg_pc          <= 0;
-    reg_iLUI        <= 0;
-    reg_iAUIPC      <= 0;
-    reg_iJAL        <= 0;
-    reg_iJALR       <= 0;
-    reg_iB          <= 0;
-    reg_iLD         <= 0;
-    reg_iST         <= 0;
-    reg_iALUi       <= 0;
-    reg_iALU        <= 0;
-    reg_iF          <= 0;
-    reg_iE          <= 0;
-    reg_iCSR        <= 0;
-    reg_rs1_a       <= 0;
-    reg_rs2_a_shamt <= 0;
-    reg_rd_a        <= 0;
-    reg_f3          <= 0;
-    reg_f7          <= 0;
-    reg_imm         <= 0;
-    reg_rs1_o       <= 0;
-    reg_rs2_o       <= 0;
+    reg_pc        <= 0;
+    reg_iLUI      <= 0;
+    reg_iAUIPC    <= 0;
+    reg_iJAL      <= 0;
+    reg_iJALR     <= 0;
+    reg_iB        <= 0;
+    reg_iLD       <= 0;
+    reg_iST       <= 0;
+    reg_iALUi     <= 0;
+    reg_iALU      <= 0;
+    reg_iF        <= 0;
+    reg_iE        <= 0;
+    reg_iCSR      <= 0;
+    reg_rs1_a     <= 0;
+    reg_rs2_a_sht <= 0;
+    reg_rd_a      <= 0;
+    reg_f3        <= 0;
+    reg_f7        <= 0;
+    reg_imm       <= 0;
+    reg_rs1_o     <= 0;
+    reg_rs2_o     <= 0;
   end else if(flush0) begin
-    reg_iLUI        <= 0; 
-    reg_iAUIPC      <= 0; 
-    reg_iJAL        <= 0; 
-    reg_iJALR       <= 0; 
-    reg_iB          <= 0; 
-    reg_iLD         <= 0; 
-    reg_iST         <= 0; 
-    reg_iALUi       <= 0; 
-    reg_iALU        <= 0; 
-    reg_iF          <= 0; 
-    reg_iE          <= 0; 
-    reg_iCSR        <= 0; 
+    reg_iLUI      <= 0; 
+    reg_iAUIPC    <= 0; 
+    reg_iJAL      <= 0; 
+    reg_iJALR     <= 0; 
+    reg_iB        <= 0; 
+    reg_iLD       <= 0; 
+    reg_iST       <= 0; 
+    reg_iALUi     <= 0; 
+    reg_iALU      <= 0; 
+    reg_iF        <= 0; 
+    reg_iE        <= 0; 
+    reg_iCSR      <= 0; 
   end else begin
-    reg_pc          <= pc;
-    reg_iLUI        <= i_LUI;
-    reg_iAUIPC      <= i_AUIPC;
-    reg_iJAL        <= i_JAL;
-    reg_iJALR       <= i_JALR;
-    reg_iB          <= i_B;
-    reg_iLD         <= i_LD;
-    reg_iST         <= i_ST;
-    reg_iALUi       <= i_ALUi;
-    reg_iALU        <= i_ALU;
-    reg_iF          <= i_F;
-    reg_iE          <= i_E;
-    reg_iCSR        <= i_CSR;
-    reg_rs1_a       <= rs1_a;
-    reg_rs2_a_shamt <= rs2_a_shamt;
-    reg_rd_a        <= rd_a;
-    reg_f3          <= funct3;
-    reg_f7          <= funct7;
-    reg_imm         <= imm;
-    reg_rs1_o       <= rf_rs1_o;
-    reg_rs2_o       <= rf_rs2_o;
+    reg_pc        <= pc;
+    reg_iLUI      <= i_LUI;
+    reg_iAUIPC    <= i_AUIPC;
+    reg_iJAL      <= i_JAL;
+    reg_iJALR     <= i_JALR;
+    reg_iB        <= i_B;
+    reg_iLD       <= i_LD;
+    reg_iST       <= i_ST;
+    reg_iALUi     <= i_ALUi;
+    reg_iALU      <= i_ALU;
+    reg_iF        <= i_F;
+    reg_iE        <= i_E;
+    reg_iCSR      <= i_CSR;
+    reg_rs1_a     <= rs1_a;
+    reg_rs2_a_sht <= rs2_a_shamt;
+    reg_rd_a      <= rd_a;
+    reg_f3        <= funct3;
+    reg_f7        <= funct7;
+    reg_imm       <= imm;
+    reg_rs1_o     <= rf_rs1_o;
+    reg_rs2_o     <= rf_rs2_o;
   end
 end
 
 always_comb begin: forwarding_ctrl
   fwd_o1 = (reg_iAUIPC) ? reg_pc : 
            (reg_iJAL)   ? reg_pc : reg_rs1_o;
-  fwd_o2 = (reg_iAUIPC)                 ? reg_imm     :
-           (reg_iJAL)                   ? 32'd4       : 
+  fwd_o2 = (reg_iAUIPC)                 ? reg_imm       :
+           (reg_iJAL)                   ? 32'd4         : 
            (reg_iALUi & reg_f3==3'b001) | 
-           (reg_iALUi & reg_f3==3'b101) ? rs2_a_shamt :
-           (reg_iALUi)                  ? reg_imm     : reg_rs2_o;
+           (reg_iALUi & reg_f3==3'b101) ? reg_rs2_a_sht :
+           (reg_iALUi)                  ? reg_imm       : reg_rs2_o;
 end
 
 always_comb begin: branch_ctrl

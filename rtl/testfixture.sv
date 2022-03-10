@@ -137,7 +137,7 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: output_instructin 
       if(vld7) begin 
         $fwrite(fn, "%h ", pc7);
-        fwrite_instruction(fn, ins7);
+        fwrite_instruction(fn, pc7, ins7);
         $fwrite(fn, "\n");
       end
     end
@@ -146,6 +146,7 @@ end
 
 task fwrite_instruction(
 input [31:0] fn,
+input [31:0] pc,
 input [31:0] ins
 ); begin
   logic [4:0]  rs1_a;
@@ -183,8 +184,14 @@ input [31:0] ins
     $fwrite(fn, "JAL,   ");
     fw_reg_name(fn, rd_a);
     $fwrite(fn,"    ");
-    $fwrite(fn, "0x%h, ", jimm);
+    $fwrite(fn, "0x%h, ", pc+jimm);
     $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
+  end
+  if(opcode==7'b1100011) begin
+    if(funct3==3'b110) $fwrite(fn, "BLTU,  ");
+    fw_reg_name(fn, rs1_a);
+    fw_reg_name(fn, rs2_a_shamt);
+    $fwrite(fn, "0x%h, ", pc+bimm);
   end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");

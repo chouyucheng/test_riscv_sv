@@ -4,15 +4,20 @@ module testfixture;
 
 logic clk;
 logic rstn;
-logic [7:0]  sram0_0 [0:(2**14)-1];
-logic [7:0]  sram0_1 [0:(2**14)-1];
-logic [7:0]  sram0_2 [0:(2**14)-1];
-logic [7:0]  sram0_3 [0:(2**14)-1];
-logic        sram0_e;
+logic [ 7:0] sram0_0 [0:(2**14)-1];
+logic [ 7:0] sram0_1 [0:(2**14)-1];
+logic [ 7:0] sram0_2 [0:(2**14)-1];
+logic [ 7:0] sram0_3 [0:(2**14)-1];
 logic [13:0] sram0_a;
+logic        sram0_e;
 logic [31:0] sram0_o;
 
 logic [31:0] sram1 [0:(2**14)-1];
+logic [ 7:0] sram1_a;
+logic [ 3:0] sram1_we;
+logic [31:0] sram1_wd;
+logic [ 3:0] sram1_re;
+logic [31:0] sram1_rd;
 
 // core
 logic [15:0] ins_a;
@@ -57,6 +62,15 @@ initial begin: sram1_model
   // init
   integer i;
   for (i=0;i<65536;i=i+1) sram1[i] = 0;
+
+  @(posedge rstn) fork
+    forever(*) begin
+      sram1_rd[ 0+:8] = sram1_re[0] ? sram1[sram1_a] : 0;
+      sram1_rd[ 8+:8] = sram1_re[1] ? sram1[sram1_a] : 0;
+      sram1_rd[16+:8] = sram1_re[2] ? sram1[sram1_a] : 0;
+      sram1_rd[24+:8] = sram1_re[3] ? sram1[sram1_a] : 0;
+    end
+  join
   //for (i=0;i<10;i=i+1) $display("%h", sram0[i]);
 end
 
@@ -110,7 +124,7 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: pipe2_ins_mem_out
     end
     forever @(posedge clk) begin: pipe3_ins_reg_out
-      vld3 <= core0.ifu_en & !core0.branch;
+      vld3 <= core0.ifu_vld & !core0.branch;
       pc3  <= core0.ifu_pc;
       ins3 <= core0.ifu_ins;
     end

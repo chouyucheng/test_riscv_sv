@@ -14,7 +14,7 @@ input  [31:0]  dat_rd
 );
 
 // instruction fetch unit 
-logic        ifu_en;
+logic        ifu_vd;
 logic [31:0] ifu_pc;
 logic [31:0] ifu_ins;
 
@@ -72,12 +72,12 @@ u_ifu u_ifu0(
 .flush   (hzf_ifu ),
 .branch  (branch  ),
 .br_adr  (br_adr_o),
+.ifu_vld (ifu_vld ),
+.ifu_pc  (ifu_pc  ),
+.ifu_ins (ifu_ins ), 
 .ins_a   (ins_a   ),
 .ins_e   (ins_e   ),
-.ins     (ins     ),
-.ifu_en  (ifu_en  ),
-.ifu_pc  (ifu_pc  ),
-.ifu_ins (ifu_ins ) 
+.ins     (ins     )
 );
 
 u_dec u_dec0(
@@ -114,7 +114,7 @@ u_rf u_rf0(
 );
 
 u_hz u_hz0 (
-.ifu_en  (ifu_en ),
+.ifu_vld (ifu_vld),
 .branch  (branch ),
 .hzf_ifu (hzf_ifu),
 .hzf_ex0 (hzf_ex0)

@@ -17,6 +17,19 @@ output logic [3:0]  dat_re,
 input        [31:0] dat_rd
 );
 
+always_comb begin: ctrl_sram1
+  dat_a  = lsu_a;
+  dat_we = lsu_we;
+  dat_wd = lsu_wd;
+  dat_re = lsu_re;
+  lsu_rd = dat_rd;
+end
+
+always@(posedge clk or negedge rstn) begin: reg_lsu_vld
+  if(!rstn) lsu_vld <= 0;
+  else      lsu_vld <= |lsu_re;
+end
+
 endmodule
 
 

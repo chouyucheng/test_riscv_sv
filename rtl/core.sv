@@ -57,6 +57,13 @@ logic [31:0] br_adr_i1;
 logic [31:0] br_adr_i2;
 logic [31:0] br_adr_o;
 
+// load store unit
+logic [31:0] lsu_a;
+logic [ 3:0] lsu_we;
+logic [31:0] lsu_wd;
+logic [ 3:0] lsu_re;
+logic        lsu_vld;
+logic [31:0] lsu_rd;
 
 // alu 
 logic [3:0]  alu_op;
@@ -175,7 +182,23 @@ u_br_adr u_br_adr0(
 .br_adr_o  (br_adr_o )        
 );
 
-u_alu u_alu0(
+u_lsu u_lsu0 (
+.clk     (clk    ),
+.rstn    (rstn   ),
+.lsu_a   (lsu_a  ),
+.lsu_we  (lsu_we ),
+.lsu_wd  (lsu_wd ),
+.lsu_re  (lsu_re ),
+.lsu_vld (lsu_vld),
+.lsu_rd  (lsu_rd ),
+.dat_a   (dat_a  ),
+.dat_we  (dat_we ),
+.dat_wd  (dat_wd ),
+.dat_re  (dat_re ),
+.dat_rd  (dat_rd )
+);
+
+U_alu u_alu0(
 .alu_op  (alu_op ),
 .alu_i1  (alu_i1 ),
 .alu_i2  (alu_i2 ),

@@ -41,13 +41,19 @@ output logic [31:0] alu_i1,
 output logic [31:0] alu_i2,
 input        [31:0] alu_o,
 input               alu_lt,
-input               alu_ltu
+input               alu_ltu,
 // csr
-
 // lsu
+output logic  [31:0] lsu_a,
+output logic  [ 3:0] lsu_we,
+output logic  [31:0] lsu_wd,
+output logic  [ 3:0] lsu_re,
+// output
+input                lsu_vld,
+input         [31:0] lsu_rd
 );
 
-// input reg 
+// pipe0 input reg 
 logic [31:0] reg_pc;
 logic        reg_iLUI;
 logic        reg_iAUIPC;
@@ -70,9 +76,12 @@ logic [31:0] reg_imm;
 logic [31:0] reg_rs1_o;
 logic [31:0] reg_rs2_o;
 
-// forwarding
+//forwarding
 logic [31:0] fwd_o1;
 logic [31:0] fwd_o2;
+
+// lsu
+
 
 // write regfile buffer
 logic        buf0_we;
@@ -85,7 +94,7 @@ logic        buf2_we;
 logic  [4:0] buf2_a;
 logic [31:0] buf2_d;
 
-always_ff@(posedge clk or negedge rstn) begin: input_reg
+always_ff@(posedge clk or negedge rstn) begin: p0_reg_input
   if(!rstn) begin
     reg_pc        <= 0;
     reg_iLUI      <= 0;
@@ -146,28 +155,30 @@ always_ff@(posedge clk or negedge rstn) begin: input_reg
   end
 end
 
-always_comb begin: forwarding_ctrl
+always_comb begin: p1_ctrl_forwarding
   fwd_o1 = (reg_iAUIPC) ? reg_pc : 
            (reg_iJAL)   ? reg_pc : reg_rs1_o;
   fwd_o2 = (reg_iAUIPC)                 ? reg_imm       :
            (reg_iJAL)                   ? 32'd4         : 
+           (reg_iST)                    ? reg_imm       :
            (reg_iALUi & reg_f3==3'b001) | 
            (reg_iALUi & reg_f3==3'b101) ? reg_rs2_a_sht :
            (reg_iALUi)                  ? reg_imm       : reg_rs2_o;
 end
 
-always_comb begin: branch_ctrl
+always_comb begin: p1_ctrl_branch
   branch = (reg_iJAL) | 
            (reg_iB & reg_f3==3'b110 & alu_ltu);
 end
 
-always_comb begin: branch_adr_ctrl
+always_comb begin: p1_ctrl_branch_adr
   br_adr_i1 = reg_pc;
   br_adr_i2 = reg_imm;
 end
 
-always_comb begin: alu_ctrl
-  alu_op[2:0] = (reg_iAUIPC) ? 3'b000 : reg_f3;
+always_comb begin: p1_ctrl_alu
+  alu_op[2:0] = (reg_iAUIPC) ? 3'b000 : 
+                (reg_iST)    ? 3'b000 : reg_f3;
   alu_op[3]   = (reg_iALU) | 
                 (reg_iALUi & reg_f3==3'b101) ? reg_f7[5] : 0; 
 
@@ -175,7 +186,15 @@ always_comb begin: alu_ctrl
   alu_i2 = fwd_o2; 
 end
 
-always_ff@(posedge clk or negedge rstn) begin: write_regfile_buffer
+always_ff@(posedge clk or negedge rstn) begin: p1_reg_lsu
+  if(!rstn) begin
+    lsu_a <= 0;
+  end else begin
+    lsu_a <= (reg_iST) ? alu_o : lsu_a;
+  end
+end
+
+always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
   if(!rstn) begin
     buf0_we <= 0;
     buf0_a  <= 0;

@@ -170,10 +170,15 @@ u_exe u_exe0 (
 .alu_i2      (alu_i2     ),
 .alu_o       (alu_o      ), 
 .alu_lt      (alu_lt     ),
-.alu_ltu     (alu_ltu    )
+.alu_ltu     (alu_ltu    ),
 // csr
-
 // lsu
+.lsu_a       (lsu_a      ),
+.lsu_we      (lsu_we     ),
+.lsu_wd      (lsu_wd     ),
+.lsu_re      (lsu_re     ),
+.lsu_vld     (lsu_vld    ),
+.lsu_rd      (lsu_rd     )
 );
 
 u_br_adr u_br_adr0(
@@ -215,3 +220,4 @@ endmodule
 
 
 
+dule

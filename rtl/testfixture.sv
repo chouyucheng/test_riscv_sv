@@ -23,6 +23,11 @@ logic [31:0] sram1_rd;
 logic [15:0] ins_a;
 logic        ins_e;
 logic [31:0] ins;
+logic [15:0] dat_a;
+logic [3:0]  dat_we;
+logic [31:0] dat_wd;
+logic [3:0]  dat_re;
+logic [31:0] dat_rd;
 
 initial begin: clock
   clk = 0;
@@ -45,7 +50,7 @@ initial begin: sram0_model
 
   @(posedge rstn) fork
     forever@(posedge clk) begin
-      sram0_a <= ins_a[15:2];
+      sram0_a <= ins_a[7+2:2];
       sram0_e <= ins_e;
     end
     forever@(*) begin
@@ -62,29 +67,42 @@ initial begin: sram1_model
   // init
   integer i;
   for (i=0;i<65536;i=i+1) sram1[i] = 0;
+  sram1_we = 0;
 
   @(posedge rstn) fork
-    forever(*) begin
-      sram1_rd[ 0+:8] = sram1_re[0] ? sram1[sram1_a] : 0;
-      sram1_rd[ 8+:8] = sram1_re[1] ? sram1[sram1_a] : 0;
-      sram1_rd[16+:8] = sram1_re[2] ? sram1[sram1_a] : 0;
-      sram1_rd[24+:8] = sram1_re[3] ? sram1[sram1_a] : 0;
+    forever@(posedge clk) begin
+      sram1_a  <= dat_a[7+2:2];
+      sram1_we <= dat_we;
+      sram1_wd <= dat_wd;
+      sram1_re <= dat_re;
+    end
+    forever@(*) begin: write_sram1
+      if(sram1_we[0]) sram1[sram1_a][ 0+:8] = sram1_wd[ 0+:8];
+      if(sram1_we[1]) sram1[sram1_a][ 8+:8] = sram1_wd[ 8+:8];
+      if(sram1_we[2]) sram1[sram1_a][16+:8] = sram1_wd[16+:8];
+      if(sram1_we[3]) sram1[sram1_a][24+:8] = sram1_wd[24+:8];
+    end
+    forever@(*) begin: read_sram1
+      if(sram1_re[0]) sram1_rd[ 0+:8] = sram1[sram1_a][ 0+:8];
+      if(sram1_re[1]) sram1_rd[ 8+:8] = sram1[sram1_a][ 8+:8];
+      if(sram1_re[2]) sram1_rd[16+:8] = sram1[sram1_a][16+:8];
+      if(sram1_re[3]) sram1_rd[24+:8] = sram1[sram1_a][24+:8];
     end
   join
   //for (i=0;i<10;i=i+1) $display("%h", sram0[i]);
 end
 
 core core0(
-.clk    (clk),
-.rstn   (rstn),
+.clk    (clk   ),
+.rstn   (rstn  ),
 .ins_a  (ins_a ),
 .ins_e  (ins_e ),
 .ins    (ins   ),
-.dat_a  (/*dat_a */),
-.dat_we (/*dat_we*/),
-.dat_wd (/*dat_wd*/),
-.dat_re (/*dat_re*/),
-.dat_rd (/*dat_rd*/)
+.dat_a  (dat_a ),
+.dat_we (dat_we),
+.dat_wd (dat_wd),
+.dat_re (dat_re),
+.dat_rd (dat_rd)
 );
 
 initial begin: monitor_ins
@@ -112,6 +130,8 @@ initial begin: monitor_instruction
   integer vld3, vld4, vld5, vld6, vld7;
   integer pc3,  pc4,  pc5,  pc6,  pc7;
   integer ins3, ins4, ins5, ins6, ins7;
+  integer             adr5, adr6, adr7;
+  integer             wd5,  wd6,  wd7;
 
   fn = $fopen("do_ins.txt","w");
   vld3=0;vld4=0;vld5=0;vld6=0;vld7=0;
@@ -128,30 +148,36 @@ initial begin: monitor_instruction
       pc3  <= core0.ifu_pc;
       ins3 <= core0.ifu_ins;
     end
-    forever @(posedge clk) begin: pipe3_exe
+    forever @(posedge clk) begin: pipe4_exe
       vld4 <= vld3;
       pc4  <= pc3;
       ins4 <= ins3;
     end
-    forever @(posedge clk) begin: pipe4_csr
+    forever @(posedge clk) begin: pipe5_csr
       vld5 <= vld4;
       pc5  <= pc4;
       ins5 <= ins4;
+      adr5 <= core0.lsu_a;
+      wd5  <= core0.lsu_wd;
     end
-    forever @(posedge clk) begin: pipe5_lsu
+    forever @(posedge clk) begin: pipe6_lsu
       vld6 <= vld5;
       pc6  <= pc5;
       ins6 <= ins5;
+      adr6 <= adr5;
+      wd6  <= adr5;
     end
-    forever @(posedge clk) begin: pipe6_commit
+    forever @(posedge clk) begin: pipe7_commit
       vld7 <= vld6;
       pc7  <= pc6;
       ins7 <= ins6;
+      adr7 <= adr6;
+      wd7  <= wd6;
     end
     forever @(posedge clk) begin: output_instructin 
       if(vld7) begin 
         $fwrite(fn, "%h ", pc7);
-        fwrite_instruction(fn, pc7, ins7);
+        fwrite_instruction(fn, pc7, ins7, adr7, wd7);
         $fwrite(fn, "\n");
       end
     end
@@ -161,7 +187,9 @@ end
 task fwrite_instruction(
 input [31:0] fn,
 input [31:0] pc,
-input [31:0] ins
+input [31:0] ins,
+input [31:0] adr,
+input [31:0] wd
 ); begin
   logic [4:0]  rs1_a;
   logic [4:0]  rs2_a_shamt;
@@ -206,6 +234,13 @@ input [31:0] ins
     fw_reg_name(fn, rs1_a);
     fw_reg_name(fn, rs2_a_shamt);
     $fwrite(fn, "0x%h, ", pc+bimm);
+  end
+  if(opcode==7'b0100011) begin
+    if(funct3==3'b010) $fwrite(fn, "SW,    ");
+    fw_reg_name(fn, rs1_a);
+    fw_reg_name(fn, rs2_a_shamt);
+    $fwrite(fn, "0x%h, ", simm);
+    $fwrite(fn, "sram1\[0x%h\]=0x%h", adr, wd);
   end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");

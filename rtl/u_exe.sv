@@ -53,28 +53,28 @@ input                lsu_vld,
 input         [31:0] lsu_rd
 );
 
-// pipe0 input reg 
-logic [31:0] reg_pc;
-logic        reg_iLUI;
-logic        reg_iAUIPC;
-logic        reg_iJAL;
-logic        reg_iJALR;
-logic        reg_iB;
-logic        reg_iLD;
-logic        reg_iST;
-logic        reg_iALUi;
-logic        reg_iALU;
-logic        reg_iF;
-logic        reg_iE;
-logic        reg_iCSR;
-logic [4:0]  reg_rs1_a;
-logic [4:0]  reg_rs2_a_sht;
-logic [4:0]  reg_rd_a;
-logic [2:0]  reg_f3;
-logic [6:0]  reg_f7;
-logic [31:0] reg_imm;
-logic [31:0] reg_rs1_o;
-logic [31:0] reg_rs2_o;
+// pipe1 input reg 
+logic [31:0] p1_pc;
+logic        p1_iLUI;
+logic        p1_iAUIPC;
+logic        p1_iJAL;
+logic        p1_iJALR;
+logic        p1_iB;
+logic        p1_iLD;
+logic        p1_iST;
+logic        p1_iALUi;
+logic        p1_iALU;
+logic        p1_iF;
+logic        p1_iE;
+logic        p1_iCSR;
+logic [4:0]  p1_rs1_a;
+logic [4:0]  p1_rs2_a_sht;
+logic [4:0]  p1_rd_a;
+logic [2:0]  p1_f3;
+logic [6:0]  p1_f7;
+logic [31:0] p1_imm;
+logic [31:0] p1_rs1_o;
+logic [31:0] p1_rs2_o;
 
 //forwarding
 logic [31:0] fwd_o1;
@@ -94,103 +94,108 @@ logic        buf2_we;
 logic  [4:0] buf2_a;
 logic [31:0] buf2_d;
 
-always_ff@(posedge clk or negedge rstn) begin: p0_reg_input
+always_ff@(posedge clk or negedge rstn) begin: p1_reg_input
   if(!rstn) begin
-    reg_pc        <= 0;
-    reg_iLUI      <= 0;
-    reg_iAUIPC    <= 0;
-    reg_iJAL      <= 0;
-    reg_iJALR     <= 0;
-    reg_iB        <= 0;
-    reg_iLD       <= 0;
-    reg_iST       <= 0;
-    reg_iALUi     <= 0;
-    reg_iALU      <= 0;
-    reg_iF        <= 0;
-    reg_iE        <= 0;
-    reg_iCSR      <= 0;
-    reg_rs1_a     <= 0;
-    reg_rs2_a_sht <= 0;
-    reg_rd_a      <= 0;
-    reg_f3        <= 0;
-    reg_f7        <= 0;
-    reg_imm       <= 0;
-    reg_rs1_o     <= 0;
-    reg_rs2_o     <= 0;
+    p1_pc        <= 0;
+    p1_iLUI      <= 0;
+    p1_iAUIPC    <= 0;
+    p1_iJAL      <= 0;
+    p1_iJALR     <= 0;
+    p1_iB        <= 0;
+    p1_iLD       <= 0;
+    p1_iST       <= 0;
+    p1_iALUi     <= 0;
+    p1_iALU      <= 0;
+    p1_iF        <= 0;
+    p1_iE        <= 0;
+    p1_iCSR      <= 0;
+    p1_rs1_a     <= 0;
+    p1_rs2_a_sht <= 0;
+    p1_rd_a      <= 0;
+    p1_f3        <= 0;
+    p1_f7        <= 0;
+    p1_imm       <= 0;
+    p1_rs1_o     <= 0;
+    p1_rs2_o     <= 0;
   end else if(flush0) begin
-    reg_iLUI      <= 0; 
-    reg_iAUIPC    <= 0; 
-    reg_iJAL      <= 0; 
-    reg_iJALR     <= 0; 
-    reg_iB        <= 0; 
-    reg_iLD       <= 0; 
-    reg_iST       <= 0; 
-    reg_iALUi     <= 0; 
-    reg_iALU      <= 0; 
-    reg_iF        <= 0; 
-    reg_iE        <= 0; 
-    reg_iCSR      <= 0; 
+    p1_iLUI      <= 0; 
+    p1_iAUIPC    <= 0; 
+    p1_iJAL      <= 0; 
+    p1_iJALR     <= 0; 
+    p1_iB        <= 0; 
+    p1_iLD       <= 0; 
+    p1_iST       <= 0; 
+    p1_iALUi     <= 0; 
+    p1_iALU      <= 0; 
+    p1_iF        <= 0; 
+    p1_iE        <= 0; 
+    p1_iCSR      <= 0; 
   end else begin
-    reg_pc        <= pc;
-    reg_iLUI      <= i_LUI;
-    reg_iAUIPC    <= i_AUIPC;
-    reg_iJAL      <= i_JAL;
-    reg_iJALR     <= i_JALR;
-    reg_iB        <= i_B;
-    reg_iLD       <= i_LD;
-    reg_iST       <= i_ST;
-    reg_iALUi     <= i_ALUi;
-    reg_iALU      <= i_ALU;
-    reg_iF        <= i_F;
-    reg_iE        <= i_E;
-    reg_iCSR      <= i_CSR;
-    reg_rs1_a     <= rs1_a;
-    reg_rs2_a_sht <= rs2_a_shamt;
-    reg_rd_a      <= rd_a;
-    reg_f3        <= funct3;
-    reg_f7        <= funct7;
-    reg_imm       <= imm;
-    reg_rs1_o     <= rf_rs1_o;
-    reg_rs2_o     <= rf_rs2_o;
+    p1_pc        <= pc;
+    p1_iLUI      <= i_LUI;
+    p1_iAUIPC    <= i_AUIPC;
+    p1_iJAL      <= i_JAL;
+    p1_iJALR     <= i_JALR;
+    p1_iB        <= i_B;
+    p1_iLD       <= i_LD;
+    p1_iST       <= i_ST;
+    p1_iALUi     <= i_ALUi;
+    p1_iALU      <= i_ALU;
+    p1_iF        <= i_F;
+    p1_iE        <= i_E;
+    p1_iCSR      <= i_CSR;
+    p1_rs1_a     <= rs1_a;
+    p1_rs2_a_sht <= rs2_a_shamt;
+    p1_rd_a      <= rd_a;
+    p1_f3        <= funct3;
+    p1_f7        <= funct7;
+    p1_imm       <= imm;
+    p1_rs1_o     <= rf_rs1_o;
+    p1_rs2_o     <= rf_rs2_o;
   end
 end
 
 always_comb begin: p1_ctrl_forwarding
-  fwd_o1 = (reg_iAUIPC) ? reg_pc : 
-           (reg_iJAL)   ? reg_pc : reg_rs1_o;
-  fwd_o2 = (reg_iAUIPC)                 ? reg_imm       :
-           (reg_iJAL)                   ? 32'd4         : 
-           (reg_iST)                    ? reg_imm       :
-           (reg_iALUi & reg_f3==3'b001) | 
-           (reg_iALUi & reg_f3==3'b101) ? reg_rs2_a_sht :
-           (reg_iALUi)                  ? reg_imm       : reg_rs2_o;
+  fwd_o1 = (p1_iAUIPC) ? p1_pc : 
+           (p1_iJAL)   ? p1_pc : p1_rs1_o;
+  fwd_o2 = (p1_iAUIPC)                ? p1_imm       :
+           (p1_iJAL)                  ? 32'd4        : 
+           (p1_iST)                   ? p1_imm       :
+           (p1_iALUi & p1_f3==3'b001) | 
+           (p1_iALUi & p1_f3==3'b101) ? p1_rs2_a_sht :
+           (p1_iALUi)                 ? p1_imm       : p1_rs2_o;
 end
 
 always_comb begin: p1_ctrl_branch
-  branch = (reg_iJAL) | 
-           (reg_iB & reg_f3==3'b110 & alu_ltu);
+  branch = (p1_iJAL) | 
+           (p1_iB & p1_f3==3'b110 & alu_ltu);
 end
 
 always_comb begin: p1_ctrl_branch_adr
-  br_adr_i1 = reg_pc;
-  br_adr_i2 = reg_imm;
+  br_adr_i1 = p1_pc;
+  br_adr_i2 = p1_imm;
 end
 
 always_comb begin: p1_ctrl_alu
-  alu_op[2:0] = (reg_iAUIPC) ? 3'b000 : 
-                (reg_iST)    ? 3'b000 : reg_f3;
-  alu_op[3]   = (reg_iALU) | 
-                (reg_iALUi & reg_f3==3'b101) ? reg_f7[5] : 0; 
+  alu_op[2:0] = (p1_iAUIPC) ? 3'b000 : 
+                (p1_iST)    ? 3'b000 : p1_f3;
+  alu_op[3]   = (p1_iALU) | 
+                (p1_iALUi & p1_f3==3'b101) ? p1_f7[5] : 0; 
 
   alu_i1 = fwd_o1;
   alu_i2 = fwd_o2; 
 end
 
-always_ff@(posedge clk or negedge rstn) begin: p1_reg_lsu
+always_ff@(posedge clk or negedge rstn) begin: p2_reg_lsu
   if(!rstn) begin
-    lsu_a <= 0;
+    lsu_a  <= 0;
+    lsu_we <= 0;
+    lsu_wd <= 0;
+    lsu_re <= 0;
   end else begin
-    lsu_a <= (reg_iST) ? alu_o : lsu_a;
+    lsu_a  <= (p1_iST) ? alu_o : lsu_a;
+    lsu_we <= (p1_iST & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
+    lsu_wd <= (p1_iST) ? fwd_o2 : lsu_wd;
   end
 end
 
@@ -206,9 +211,9 @@ always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    buf0_we <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi);
-    buf0_a  <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi) ? reg_rd_a : 0;
-    buf0_d  <= (reg_iAUIPC | reg_iJAL | reg_iALU | reg_iALUi) ? alu_o    : 0;
+    buf0_we <= (p1_iAUIPC | p1_iJAL | p1_iALU | p1_iALUi);
+    buf0_a  <= (p1_iAUIPC | p1_iJAL | p1_iALU | p1_iALUi) ? p1_rd_a : 0;
+    buf0_d  <= (p1_iAUIPC | p1_iJAL | p1_iALU | p1_iALUi) ? alu_o    : 0;
     buf1_we <=  buf0_we;
     buf1_a  <=  buf0_a;
     buf1_d  <=  buf0_d;

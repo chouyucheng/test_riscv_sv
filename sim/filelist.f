@@ -6,4 +6,5 @@
 ../rtl/u_hz.sv
 ../rtl/u_exe.sv
 ../rtl/u_br_adr.sv
+../rtl/u_lsu.sv
 ../rtl/u_alu.sv

@@ -203,7 +203,7 @@ u_lsu u_lsu0 (
 .dat_rd  (dat_rd )
 );
 
-U_alu u_alu0(
+u_alu u_alu0(
 .alu_op  (alu_op ),
 .alu_i1  (alu_i1 ),
 .alu_i2  (alu_i2 ),
@@ -220,4 +220,3 @@ endmodule
 
 
 
-dule

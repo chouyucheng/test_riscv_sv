@@ -119,7 +119,7 @@ initial begin: monitor_ins
 //    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
 //              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
     $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
-              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.reg_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
+              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.p1_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
     i=i+1;
     @(posedge clk) #1;
   end
@@ -237,8 +237,8 @@ input [31:0] wd
   end
   if(opcode==7'b0100011) begin
     if(funct3==3'b010) $fwrite(fn, "SW,    ");
-    fw_reg_name(fn, rs1_a);
     fw_reg_name(fn, rs2_a_shamt);
+    fw_reg_name(fn, rs1_a);
     $fwrite(fn, "0x%h, ", simm);
     $fwrite(fn, "sram1\[0x%h\]=0x%h", adr, wd);
   end

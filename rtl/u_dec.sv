@@ -45,8 +45,8 @@ always_comb begin: ctrl_opcode
   i_LUI   = (opcode==7'b0110111);
   i_AUIPC = (opcode==7'b0010111);
   i_JAL   = (opcode==7'b1101111);
-  i_JALR  = (opcode==7'b1100111);
-  i_B     = (opcode==7'b1100011);  
+  i_JALR  = (opcode==7'b1100111)&(funct3==3'b000);
+  i_B     = (opcode==7'b1100011)&(funct3!=3'b010)&(funct3!=3'b011);  
   i_LD    = (opcode==7'b0000011);
   i_ST    = (opcode==7'b0100011);
   i_ALUi  = (opcode==7'b0010011);
@@ -56,15 +56,15 @@ always_comb begin: ctrl_opcode
   i_CSR   = (opcode==7'b1110011);
 end
 
-always_comb begin: ctrl_imm
-  imm = (i_LUI)   ? uimm :  
-        (i_AUIPC) ? uimm : 
-        (i_JAL)   ? jimm : 
-        (i_JALR)  ? iimm : 
-        (i_B)     ? bimm : 
-        (i_LD)    ? iimm : 
-        (i_ST)    ? simm :
-        (i_ALUi)  ? iimm : 0;
+always_comb begin: mux_imm
+  imm = (i_LUI   ? uimm:0)|    
+        (i_AUIPC ? uimm:0)| 
+        (i_JAL   ? jimm:0)| 
+        (i_JALR  ? iimm:0)| 
+        (i_B     ? bimm:0)| 
+        (i_LD    ? iimm:0)| 
+        (i_ST    ? simm:0)|
+        (i_ALUi  ? iimm:0);
 end
 
 endmodule

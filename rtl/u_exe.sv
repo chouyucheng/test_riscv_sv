@@ -156,16 +156,12 @@ always_ff@(posedge clk or negedge rstn) begin: p1_reg_input
 end
 
 always_comb begin: p1_ctrl_forwarding
-  fwd_o1 = (p1_iAUIPC) ? p1_pc : 
-           (p1_iJAL)   ? p1_pc : 
-           (p1_iJALR)  ? p1_pc : p1_rs1_o;
-  fwd_o2 = (p1_iAUIPC)                ? p1_imm       :
-           (p1_iJAL)                  ? 32'd4        : 
-           (p1_iJALR)                 ? 32'd4        :
-           (p1_iST)                   ? p1_imm       :
-           (p1_iALUi & p1_f3==3'b001) | 
-           (p1_iALUi & p1_f3==3'b101) ? p1_rs2_a_sht :
-           (p1_iALUi)                 ? p1_imm       : p1_rs2_o;
+  fwd_o1 = (buf0_we & p1_rs1_a    ==buf0_a) ? buf0_d : 
+           (buf1_we & p1_rs1_a    ==buf1_a) ? buf1_d :
+           (buf2_we & p1_rs1_a    ==buf2_a) ? buf2_d : p1_rs1_o;
+  fwd_o2 = (buf0_we & p1_rs2_a_sht==buf0_a) ? buf0_d : 
+           (buf1_we & p1_rs2_a_sht==buf1_a) ? buf1_d :
+           (buf2_we & p1_rs2_a_sht==buf2_a) ? buf2_d : p1_rs2_o;
 end
 
 always_comb begin: p1_ctrl_branch
@@ -185,8 +181,16 @@ always_comb begin: p1_ctrl_alu
   alu_op[3]   = (p1_iALU) | 
                 (p1_iALUi & p1_f3==3'b101) ? p1_f7[5] : 0; 
 
-  alu_i1 = fwd_o1;
-  alu_i2 = fwd_o2; 
+  alu_i1 = (p1_iAUIPC) ? p1_pc : 
+           (p1_iJAL)   ? p1_pc : 
+           (p1_iJALR)  ? p1_pc : fwd_o1;
+  alu_i2 = (p1_iAUIPC)                ? p1_imm       :
+           (p1_iJAL)                  ? 32'd4        : 
+           (p1_iJALR)                 ? 32'd4        :
+           (p1_iST)                   ? p1_imm       :
+           (p1_iALUi & p1_f3==3'b001) | 
+           (p1_iALUi & p1_f3==3'b101) ? p1_rs2_a_sht :
+           (p1_iALUi)                 ? p1_imm       : fwd_o2;
 end
 
 always_ff@(posedge clk or negedge rstn) begin: p2_reg_lsu

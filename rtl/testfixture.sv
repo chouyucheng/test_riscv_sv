@@ -229,6 +229,12 @@ input [31:0] wd
     $fwrite(fn, "0x%h, ", pc+jimm);
     $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
   end
+  if(opcode==7'b1100111)&(funct3==3'b000) begin
+    $fwrite(fn, "JALR,  ");
+    fw_reg_name(fn, rd_a);
+    fw_reg_name(fn, rs1_a);
+    $fwrite(fn, "0x%h, ", iimm);
+  end
   if(opcode==7'b1100011) begin
     if(funct3==3'b110) $fwrite(fn, "BLTU,  ");
     fw_reg_name(fn, rs1_a);

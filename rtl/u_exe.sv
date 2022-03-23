@@ -29,7 +29,11 @@ output logic        rf_rd_e,
 output logic [4:0]  rf_rd_a,
 output logic [31:0] rf_rd_i,
 // hazard
-input flush0,
+input        flush0,
+input        stall0,
+input        stall1,
+input        stall2,
+output logic fwd_no_dat,
 // br_ctrl
 output logic        branch,
 // br_adr
@@ -162,6 +166,16 @@ always_comb begin: p1_ctrl_forwarding
   fwd_o2 = (buf0_we & p1_rs2_a_sht==buf0_a) ? buf0_d : 
            (buf1_we & p1_rs2_a_sht==buf1_a) ? buf1_d :
            (buf2_we & p1_rs2_a_sht==buf2_a) ? buf2_d : p1_rs2_o;
+
+  fwd_no_dat = 
+         ((           p1_rs1_a    ==0)      ? 0 : 
+          (!buf0_we & p1_rs1_a    ==buf0_a) | 
+          (!buf1_we & p1_rs1_a    ==buf1_a) |
+          (!buf2_we & p1_rs1_a    ==buf2_a) ? 1 : 0)|
+         ((           p1_rs2_a_sht==0)      ? 0
+          (!buf0_we & p1_rs2_a_sht==buf0_a) |  
+          (!buf1_we & p1_rs2_a_sht==buf1_a) | 
+          (!buf2_we & p1_rs2_a_sht==buf2_a) ? 1 : 0);
 end
 
 always_comb begin: p1_ctrl_branch

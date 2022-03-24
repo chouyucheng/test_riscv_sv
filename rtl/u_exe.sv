@@ -134,7 +134,7 @@ always_ff@(posedge clk or negedge rstn) begin: p1_reg_input
     p1_iF        <= 0; 
     p1_iE        <= 0; 
     p1_iCSR      <= 0; 
-  end else begin
+  end else if(!stall0) begin
     p1_pc        <= pc;
     p1_iLUI      <= i_LUI;
     p1_iAUIPC    <= i_AUIPC;
@@ -172,7 +172,7 @@ always_comb begin: p1_ctrl_forwarding
           (!buf0_we & p1_rs1_a    ==buf0_a) | 
           (!buf1_we & p1_rs1_a    ==buf1_a) |
           (!buf2_we & p1_rs1_a    ==buf2_a) ? 1 : 0)|
-         ((           p1_rs2_a_sht==0)      ? 0
+         ((           p1_rs2_a_sht==0)      ? 0 :
           (!buf0_we & p1_rs2_a_sht==buf0_a) |  
           (!buf1_we & p1_rs2_a_sht==buf1_a) | 
           (!buf2_we & p1_rs2_a_sht==buf2_a) ? 1 : 0);
@@ -214,9 +214,9 @@ always_ff@(posedge clk or negedge rstn) begin: p2_reg_lsu
     lsu_wd <= 0;
     lsu_re <= 0;
   end else begin
-    lsu_a  <= (p1_iST) ? alu_o : lsu_a;
-    lsu_we <= (p1_iST & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
-    lsu_wd <= (p1_iST) ? fwd_o2 : lsu_wd;
+    lsu_a  <= (!stall1 & p1_iST) ? alu_o : lsu_a;
+    lsu_we <= (!stall1 & p1_iST & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
+    lsu_wd <= (!stall1 & p1_iST) ? fwd_o2 : lsu_wd;
   end
 end
 
@@ -232,15 +232,20 @@ always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    buf0_we <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
-                p1_iALU | p1_iALUi) & (p1_rd_a!=0);
-    buf0_a  <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
-                p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? p1_rd_a : 0;
-    buf0_d  <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
-                p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? alu_o   : 0;
-    buf1_we <=  buf0_we;
-    buf1_a  <=  buf0_a;
-    buf1_d  <=  buf0_d;
+    if(!stall1) begin
+      buf0_we <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
+                  p1_iALU | p1_iALUi) & (p1_rd_a!=0);
+      buf0_a  <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
+                  p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? p1_rd_a : 0;
+      buf0_d  <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
+                  p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? alu_o   : 0;
+    end
+    if(!stall2) begin
+      buf1_we <=  buf0_we;
+      buf1_a  <=  buf0_a;
+      buf1_d  <=  buf0_d;
+    end
+
     buf2_we <=  buf1_we;
     buf2_a  <=  buf1_a;
     buf2_d  <=  buf1_d;

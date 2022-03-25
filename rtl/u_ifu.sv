@@ -3,6 +3,7 @@ input clk,
 input rstn,
 // hazard
 input flush,
+input stall,
 // branch
 input        branch,
 input [31:0] br_adr,
@@ -23,7 +24,8 @@ logic [31:0] pc_p1;
 
 always_ff@(posedge clk or negedge rstn) begin: pipe0_reg_pc
   if(!rstn) pc <= 0;
-  else      pc <= branch ? br_adr : pc + 4;
+  else      pc <= stall  ? pc     : 
+                  branch ? br_adr : pc + 4;
 end
 
 assign ins_e = 1;
@@ -38,7 +40,7 @@ always_ff@(posedge clk or negedge rstn) begin: pipe1_reg
   end else if(flush) begin
     en_p1 <= 0;
     pc_p1 <= 0;
-  end else begin
+  end else if(!stall)begin
     en_p1 <= 1;
     pc_p1 <= pc;
   end
@@ -53,7 +55,7 @@ always_ff@(posedge clk or negedge rstn) begin: pipe2_reg
     ifu_vld <= 0;
     ifu_pc  <= 0;
     ifu_ins <= 0;
-  end else begin
+  end else if(!stall)begin
     ifu_vld <= en_p1;
     ifu_pc  <= pc_p1;
     ifu_ins <= ins;

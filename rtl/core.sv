@@ -49,6 +49,7 @@ logic [31:0] rf_rd_i;
 logic fwd_no_dat;
 logic hzf_ifu;
 logic hzf_ex0;
+logic hzf_ex1;
 logic hzs_ifu;
 logic hzs_ex0;
 logic hzs_ex1;
@@ -82,6 +83,7 @@ u_ifu u_ifu0(
 .clk     (clk     ),
 .rstn    (rstn    ),
 .flush   (hzf_ifu ),
+.stall   (hzs_ifu ),
 .branch  (branch  ),
 .br_adr  (br_adr_o),
 .ifu_vld (ifu_vld ),
@@ -131,6 +133,7 @@ u_hz u_hz0 (
 .fwd_no_dat (fwd_no_dat),
 .hzf_ifu    (hzf_ifu   ),
 .hzf_ex0    (hzf_ex0   ),
+.hzf_ex1    (hzf_ex1   ),
 .hzs_ifu    (hzs_ifu   ),
 .hzs_ex0    (hzs_ex0   ),
 .hzs_ex1    (hzs_ex1   ),
@@ -169,6 +172,7 @@ u_exe u_exe0 (
 .rf_rd_i     (rf_rd_i    ),
 // hazard
 .flush0      (hzf_ex0    ),
+.flush1      (hzf_ex1    ),
 .stall0      (hzs_ex0    ),
 .stall1      (hzs_ex1    ),
 .stall2      (hzs_ex2    ),

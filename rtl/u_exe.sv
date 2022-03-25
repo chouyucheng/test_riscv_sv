@@ -30,6 +30,7 @@ output logic [4:0]  rf_rd_a,
 output logic [31:0] rf_rd_i,
 // hazard
 input        flush0,
+input        flush1,
 input        stall0,
 input        stall1,
 input        stall2,
@@ -213,10 +214,14 @@ always_ff@(posedge clk or negedge rstn) begin: p2_reg_lsu
     lsu_we <= 0;
     lsu_wd <= 0;
     lsu_re <= 0;
-  end else begin
-    lsu_a  <= (!stall1 & p1_iST) ? alu_o : lsu_a;
-    lsu_we <= (!stall1 & p1_iST & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
-    lsu_wd <= (!stall1 & p1_iST) ? fwd_o2 : lsu_wd;
+  end else if(flush1) begin
+    lsu_a  <= 0;
+    lsu_we <= 0;
+    lsu_wd <= 0;
+  end else if(!stall1) begin
+    lsu_a  <= (p1_iST) ? alu_o : lsu_a;
+    lsu_we <= (p1_iST & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
+    lsu_wd <= (p1_iST) ? fwd_o2 : lsu_wd;
   end
 end
 
@@ -232,7 +237,10 @@ always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    if(!stall1) begin
+    if(flush1) begin
+      buf0_we <= 0;
+      buf0_a  <= 0;
+    end else if(!stall1) begin
       buf0_we <= (p1_iAUIPC | p1_iJAL | p1_iJALR |
                   p1_iALU | p1_iALUi) & (p1_rd_a!=0);
       buf0_a  <= (p1_iAUIPC | p1_iJAL | p1_iJALR |

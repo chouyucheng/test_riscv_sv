@@ -4,6 +4,7 @@ input  branch,
 input  fwd_no_dat,
 output logic hzf_ifu,
 output logic hzf_ex0,
+output logic hzf_ex1,
 output logic hzs_ifu,
 output logic hzs_ex0,
 output logic hzs_ex1,
@@ -13,6 +14,7 @@ output logic hzs_ex2
 always_comb begin
   hzf_ifu = 0;
   hzf_ex0 = 0;
+  hzf_ex1 = 0;
   hzs_ifu = 0;
   hzs_ex0 = 0;
   hzs_ex1 = 0;

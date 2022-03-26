@@ -111,15 +111,19 @@ initial begin: monitor_ins
 
   #1;
   @(posedge rstn);
-  repeat(30) begin
-    i=i+1;
-    @(posedge clk) #1;
-  end
+  //repeat(30) begin
+  //  i=i+1;
+  //  @(posedge clk) #1;
+  //end
   repeat(10) begin
 //    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
 //              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
-    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
-              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.p1_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
+//    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
+//              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.p1_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,iALUi %d,[b0_we %d b0_d %h],s2 %d,[b2_we %d b2_d %h]", 
+              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
+              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
+              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
     i=i+1;
     @(posedge clk) #1;
   end

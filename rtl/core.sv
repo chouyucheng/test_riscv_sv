@@ -14,7 +14,7 @@ input  [31:0]  dat_rd
 );
 
 // instruction fetch unit 
-logic        ifu_vd;
+logic        ifu_vld;
 logic [31:0] ifu_pc;
 logic [31:0] ifu_ins;
 
@@ -137,7 +137,7 @@ u_hz u_hz0 (
 .hzs_ifu    (hzs_ifu   ),
 .hzs_ex0    (hzs_ex0   ),
 .hzs_ex1    (hzs_ex1   ),
-.hzs_ex2    (hsz_ex2   )
+.hzs_ex2    (hzs_ex2   )
 );
 
 u_exe u_exe0 (

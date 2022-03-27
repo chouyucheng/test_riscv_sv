@@ -1,4 +1,5 @@
 `timescale 1ns/10ps
+//`define MONITOR_ON
 
 module testfixture;
 
@@ -105,31 +106,39 @@ core core0(
 .dat_rd (dat_rd)
 );
 
+`ifdef MONITOR_ON
 initial begin: monitor_ins
   integer i;
   i = 1;
 
   #1;
   @(posedge rstn);
-  //repeat(30) begin
-  //  i=i+1;
-  //  @(posedge clk) #1;
-  //end
-  repeat(10) begin
+  repeat(70) begin
+    i=i+1;
+    @(posedge clk) #1;
+  end
+  repeat(20) begin
 //    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
 //              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
 //    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
 //              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.p1_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,iALUi %d,[b0_we %d b0_d %h],s2 %d,[b2_we %d b2_d %h]", 
-              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
-              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
-              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,iALUi %d,[b0_we %d b0_d %h],s2 %d,[b2_we %d b2_d %h]", 
+//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
+//              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
+//              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
+    // store word
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
+              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
+              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
+              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     i=i+1;
     @(posedge clk) #1;
   end
 end
+`endif
 
 initial begin: monitor_instruction
+  integer cnt;
   integer fn;
   integer vld3, vld4, vld5, vld6, vld7;
   integer pc3,  pc4,  pc5,  pc6,  pc7;
@@ -137,6 +146,7 @@ initial begin: monitor_instruction
   integer             adr5, adr6, adr7;
   integer             wd5,  wd6,  wd7;
 
+  cnt = 1;
   fn = $fopen("do_ins.txt","w");
   vld3=0;vld4=0;vld5=0;vld6=0;vld7=0;
   
@@ -169,7 +179,7 @@ initial begin: monitor_instruction
       pc6  <= pc5;
       ins6 <= ins5;
       adr6 <= adr5;
-      wd6  <= adr5;
+      wd6  <= wd5;
     end
     forever @(posedge clk) begin: pipe7_commit
       vld7 <= vld6;
@@ -180,10 +190,12 @@ initial begin: monitor_instruction
     end
     forever @(posedge clk) begin: output_instructin 
       if(vld7) begin 
+        $fwrite(fn, "%d ", cnt[15:0]);
         $fwrite(fn, "%h ", pc7);
         fwrite_instruction(fn, pc7, ins7, adr7, wd7);
         $fwrite(fn, "\n");
       end
+      cnt = cnt + 1;
     end
   join
 end
@@ -331,7 +343,7 @@ initial begin: dump_fsdb
 end 
 
 initial begin: WDT
-  #(100 * 10);
+  #(200 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

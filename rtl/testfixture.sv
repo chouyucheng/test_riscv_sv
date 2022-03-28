@@ -1,5 +1,6 @@
 `timescale 1ns/10ps
 //`define MONITOR_ON
+//`define WAVE_ON
 
 module testfixture;
 
@@ -336,14 +337,16 @@ initial begin: monitor_regfile
 
 end
 
+`ifdef WAVE_ON
 initial begin: dump_fsdb
   $fsdbDumpfile("wave.fsdb");
   $fsdbDumpvars;
   $fsdbDumpMDA;
 end 
+`endif
 
 initial begin: WDT
-  #(200 * 10);
+  #(1000 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

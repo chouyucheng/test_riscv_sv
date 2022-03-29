@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-//`define MONITOR_ON
+`define MONITOR_ON
 //`define WAVE_ON
 
 module testfixture;
@@ -114,7 +114,7 @@ initial begin: monitor_ins
 
   #1;
   @(posedge rstn);
-  repeat(70) begin
+  repeat(14457-8) begin
     i=i+1;
     @(posedge clk) #1;
   end
@@ -128,10 +128,25 @@ initial begin: monitor_ins
 //              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
 //              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
     // store word
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
-              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
-              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
-              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
+//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
+//              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
+//              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
+    // check opcode
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
+              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              core0.u_exe0.p1_iLUI,
+              core0.u_exe0.p1_iAUIPC,
+              core0.u_exe0.p1_iJAL,
+              core0.u_exe0.p1_iJALR,
+              core0.u_exe0.p1_iB,
+              core0.u_exe0.p1_iLD,
+              core0.u_exe0.p1_iST,
+              core0.u_exe0.p1_iALUi,
+              core0.u_exe0.p1_iALU,
+              core0.u_exe0.p1_iF,
+              core0.u_exe0.p1_iE,
+              core0.u_exe0.p1_iCSR);
     i=i+1;
     @(posedge clk) #1;
   end
@@ -190,12 +205,17 @@ initial begin: monitor_instruction
       wd7  <= wd6;
     end
     forever @(posedge clk) begin: output_instructin 
-      if(vld7) begin 
+      if(cnt== 91)   $fwrite(fn, "skip1--------\n");
+      if(cnt== 7278) $fwrite(fn, "skip2--------\n");
+
+      if     (cnt>=91   & cnt<(91+  7*1022));
+      else if(cnt>=7278 & cnt<(7278+7*1022));
+      else if(vld7) begin 
         $fwrite(fn, "%d ", cnt[15:0]);
         $fwrite(fn, "%h ", pc7);
         fwrite_instruction(fn, pc7, ins7, adr7, wd7);
         $fwrite(fn, "\n");
-      end
+      end 
       cnt = cnt + 1;
     end
   join
@@ -272,6 +292,22 @@ input [31:0] wd
     $fwrite(fn, "0x%h, ", iimm);
     $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
   end
+  if(opcode==7'b0110011) begin
+    if(funct3==3'b000 & !funct7[5]) $fwrite(fn, "ADD,   ");
+    if(funct3==3'b000 &  funct7[5]) $fwrite(fn, "SUB,   ");
+    if(funct3==3'b001)              $fwrite(fn, "SLL,   ");
+    if(funct3==3'b010)              $fwrite(fn, "SLT,   ");
+    if(funct3==3'b011)              $fwrite(fn, "SLTU,  ");
+    if(funct3==3'b101 & !funct7[5]) $fwrite(fn, "SRL,   ");
+    if(funct3==3'b101 &  funct7[5]) $fwrite(fn, "SRA,   ");
+    if(funct3==3'b110)              $fwrite(fn, "OR,    ");
+    if(funct3==3'b111)              $fwrite(fn, "AND,   ");
+    fw_reg_name(fn, rd_a);
+    fw_reg_name(fn, rs1_a);
+    fw_reg_name(fn, rs2_a_shamt);
+    $fwrite(fn, "        ");
+    $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
+  end
 end endtask
 
 task fw_reg_name(
@@ -346,7 +382,7 @@ end
 `endif
 
 initial begin: WDT
-  #(1000 * 10);
+  #(14500 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

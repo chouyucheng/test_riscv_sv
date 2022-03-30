@@ -114,7 +114,7 @@ initial begin: monitor_ins
 
   #1;
   @(posedge rstn);
-  repeat(14457-8) begin
+  repeat(14532-8) begin
     i=i+1;
     @(posedge clk) #1;
   end
@@ -382,7 +382,7 @@ end
 `endif
 
 initial begin: WDT
-  #(14500 * 10);
+  #(15000 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

@@ -191,17 +191,17 @@ always_comb begin: p1_ctrl_branch_adr
 end
 
 always_comb begin: p1_ctrl_alu
-  alu_op[2:0] = (p1_iLUT)   ? 3'b000 :
+  alu_op[2:0] = (p1_iLUI)   ? 3'b000 :
                 (p1_iAUIPC) ? 3'b000 : 
                 (p1_iST)    ? 3'b000 : p1_f3;
   alu_op[3]   = (p1_iALU) | 
                 (p1_iALUi & p1_f3==3'b101) ? p1_f7[5] : 0; 
 
-  alu_i1 = (p1_iLUT)   ? 0     :
+  alu_i1 = (p1_iLUI)   ? 0     :
            (p1_iAUIPC) ? p1_pc : 
            (p1_iJAL)   ? p1_pc : 
            (p1_iJALR)  ? p1_pc : fwd_o1;
-  alu_i2 = (p1_iLUT)                  ? p1_imm       :
+  alu_i2 = (p1_iLUI)                  ? p1_imm       :
            (p1_iAUIPC)                ? p1_imm       :
            (p1_iJAL)                  ? 32'd4        : 
            (p1_iJALR)                 ? 32'd4        :
@@ -244,11 +244,11 @@ always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
       buf0_we <= 0;
       buf0_a  <= 0;
     end else if(!stall1) begin
-      buf0_we <= (p1_iLUT | p1_iAUIPC | p1_iJAL | p1_iJALR |
+      buf0_we <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
                   p1_iALU | p1_iALUi) & (p1_rd_a!=0);
-      buf0_a  <= (p1_iLUT | p1_iAUIPC | p1_iJAL | p1_iJALR |
+      buf0_a  <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
                   p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? p1_rd_a : 0;
-      buf0_d  <= (p1_iLUT | p1_iAUIPC | p1_iJAL | p1_iJALR |
+      buf0_d  <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
                   p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? alu_o   : 0;
     end
     if(!stall2) begin

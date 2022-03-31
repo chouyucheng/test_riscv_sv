@@ -252,6 +252,13 @@ input [31:0] wd
   uimm        = {    ins[31],  ins[30:20],ins[19:12],                     12'b0};
   jimm        = {{11{ins[31]}},ins[19:12],ins[20],   ins[30:25],ins[24:21],1'b0};
 
+  if(opcode==7'b0110111) begin
+    $fwrite(fn, "LUI,   ");
+    fw_reg_name(fn, rd_a);
+    $fwrite(fn, "    ");
+    $fwrite(fn, "0x%h, ", uimm);
+    $fwrite(fn, "rd:0x%h", core0.u_rf0.rf_arr[rd_a]);
+  end
   if(opcode==7'b0010111) begin
     $fwrite(fn, "AUIPC, ");
     fw_reg_name(fn, rd_a);

@@ -167,18 +167,18 @@ skip2--------
 14531 00000280 ADDI,  t0, z0, 0xffffffff, rd:0xffffffff
 14532 00000284 LUI,   t1,     0xf0f0f000, rd:0xf0f0f000
 14533 00000288 ADDI,  t1, t1, 0x000000f0, rd:0xf0f0f0f0
-14534 0000028c t0, t0, t1,         rd:0x0f0f0f0f
-14535 00000290 t0, t0, t1,         rd:0xffffffff
-14536 00000294 t0, t0, t1,         rd:0x0f0f0f0f
-14537 00000298 t0, t0, t1,         rd:0xffffffff
-14538 0000029c t0, t0, t1,         rd:0x0f0f0f0f
+14534 0000028c XOR,   t0, t0, t1,         rd:0x0f0f0f0f
+14535 00000290 XOR,   t0, t0, t1,         rd:0xffffffff
+14536 00000294 XOR,   t0, t0, t1,         rd:0x0f0f0f0f
+14537 00000298 XOR,   t0, t0, t1,         rd:0xffffffff
+14538 0000029c XOR,   t0, t0, t1,         rd:0x0f0f0f0f
 14539 000002a0 LUI,   t1,     0x77777000, rd:0x77777000
 14540 000002a4 ADDI,  t1, t1, 0x00000777, rd:0x77777777
-14541 000002a8 t0, t1, t0,         rd:0x78787878
-14542 000002ac t0, t1, t0,         rd:0x0f0f0f0f
-14543 000002b0 t0, t1, t0,         rd:0x78787878
-14544 000002b4 t0, t1, t0,         rd:0x0f0f0f0f
-14545 000002b8 t0, t1, t0,         rd:0x78787878
+14541 000002a8 XOR,   t0, t1, t0,         rd:0x78787878
+14542 000002ac XOR,   t0, t1, t0,         rd:0x0f0f0f0f
+14543 000002b0 XOR,   t0, t1, t0,         rd:0x78787878
+14544 000002b4 XOR,   t0, t1, t0,         rd:0x0f0f0f0f
+14545 000002b8 XOR,   t0, t1, t0,         rd:0x78787878
 14546 000002bc SW,    t0, s0, 0x00000000, sram1[0x00010014]=0x78787878
 14547 000002c0 ADDI,  s0, s0, 0x00000004, rd:0x00010018
 14548 000002c4 ADDI,  t0, z0, 0xffffffff, rd:0xffffffff

@@ -169,11 +169,14 @@ always_comb begin: p1_ctrl_forwarding
            (buf2_we & p1_rs2_a_sht==buf2_a) ? buf2_d : p1_rs2_o;
 
   fwd_no_dat = 
-         ((           p1_rs1_a    ==0)      ? 0 : 
+         ((p1_iLUI  | p1_iAUIPC | p1_iJAL)  ? 0 :
+          (           p1_rs1_a    ==0)      ? 0 : 
           (!buf0_we & p1_rs1_a    ==buf0_a) | 
           (!buf1_we & p1_rs1_a    ==buf1_a) |
           (!buf2_we & p1_rs1_a    ==buf2_a) ? 1 : 0)|
-         ((           p1_rs2_a_sht==0)      ? 0 :
+         ((p1_iLUI  | p1_iAUIPC | p1_iJAL)  ? 0 :
+          (p1_iJALR | p1_iLD    | p1_iALUi) ? 0 : 
+          (           p1_rs2_a_sht==0)      ? 0 :
           (!buf0_we & p1_rs2_a_sht==buf0_a) |  
           (!buf1_we & p1_rs2_a_sht==buf1_a) | 
           (!buf2_we & p1_rs2_a_sht==buf2_a) ? 1 : 0);

@@ -114,7 +114,7 @@ initial begin: monitor_ins
 
   #1;
   @(posedge rstn);
-  repeat(14532-8) begin
+  repeat(14619-8) begin
     i=i+1;
     @(posedge clk) #1;
   end
@@ -134,7 +134,7 @@ initial begin: monitor_ins
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
     $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
-              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
               core0.u_exe0.p1_iLUI,
               core0.u_exe0.p1_iAUIPC,
               core0.u_exe0.p1_iJAL,
@@ -305,6 +305,7 @@ input [31:0] wd
     if(funct3==3'b001)              $fwrite(fn, "SLL,   ");
     if(funct3==3'b010)              $fwrite(fn, "SLT,   ");
     if(funct3==3'b011)              $fwrite(fn, "SLTU,  ");
+    if(funct3==3'b100)              $fwrite(fn, "XOR,   ");
     if(funct3==3'b101 & !funct7[5]) $fwrite(fn, "SRL,   ");
     if(funct3==3'b101 &  funct7[5]) $fwrite(fn, "SRA,   ");
     if(funct3==3'b110)              $fwrite(fn, "OR,    ");

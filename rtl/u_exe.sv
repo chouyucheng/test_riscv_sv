@@ -86,7 +86,8 @@ logic [31:0] fwd_o1;
 logic [31:0] fwd_o2;
 
 // lsu
-
+logic p2_iLD;
+logic p3_iLD;
 
 // write regfile buffer
 logic        buf0_we;
@@ -194,11 +195,12 @@ always_comb begin: p1_ctrl_branch_adr
 end
 
 always_comb begin: p1_ctrl_alu
-  alu_op[2:0] = (p1_iLUI)   ? 3'b000 :
-                (p1_iAUIPC) ? 3'b000 : 
-                (p1_iST)    ? 3'b000 : p1_f3;
   alu_op[3]   = (p1_iALU) | 
                 (p1_iALUi & p1_f3==3'b101) ? p1_f7[5] : 0; 
+  alu_op[2:0] = (p1_iLUI)   ? 3'b000 :
+                (p1_iAUIPC) ? 3'b000 : 
+                (p1_iLD)    ? 3'b000 :
+                (p1_iST)    ? 3'b000 : p1_f3;
 
   alu_i1 = (p1_iLUI)   ? 0     :
            (p1_iAUIPC) ? p1_pc : 
@@ -209,6 +211,7 @@ always_comb begin: p1_ctrl_alu
            (p1_iJAL)                  ? 32'd4        : 
            (p1_iJALR)                 ? 32'd4        :
            (p1_iST)                   ? p1_imm       :
+           (p1_iLD)                   ? p1_imm       :
            (p1_iALUi & p1_f3==3'b001) | 
            (p1_iALUi & p1_f3==3'b101) ? p1_rs2_a_sht :
            (p1_iALUi)                 ? p1_imm       : fwd_o2;
@@ -220,53 +223,73 @@ always_ff@(posedge clk or negedge rstn) begin: p2_reg_lsu
     lsu_we <= 0;
     lsu_wd <= 0;
     lsu_re <= 0;
+    p2_iLD <= 0;
   end else if(flush1) begin
     lsu_a  <= 0;
     lsu_we <= 0;
     lsu_wd <= 0;
+    lsu_re <= 0;
+    p2_iLD <= 0;
   end else if(!stall1) begin
-    lsu_a  <= (p1_iST) ? alu_o  : lsu_a;
+    lsu_a  <= (p1_iST) ? alu_o : 
+              (p1_iLD) ? alu_o : lsu_a;
     lsu_we <= (p1_iST  & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
     lsu_wd <= (p1_iST) ? fwd_o2 : lsu_wd;
+    lsu_re <= (p1_iLD  & p1_f3==3'b010) ? 4'b1111 : 4'b0000;
+    p2_iLD <=  p1_iLD;
   end
 end
 
-always_ff@(posedge clk or negedge rstn) begin: reg_write_buffer
+always_ff@(posedge clk or negedge rstn) begin: p3_reg_lsu
   if(!rstn) begin
-    buf0_we <= 0;
+    p3_iLD <= 0;
+  end else if(!stall2) begin
+    p3_iLD <= p2_iLD;
+  end
+end
+
+always_ff@(posedge clk or negedge rstn) begin: p2_reg_commit
+  if(!rstn) begin
     buf0_a  <= 0;
+    buf0_we <= 0;
     buf0_d  <= 0;
-    buf1_we <= 0;
+  end else if(flush1) begin
+    buf0_a  <= 0;
+    buf0_we <= 0;
+  end else if(!stall1) begin
+    buf0_a  <=  p1_rd_a;
+    buf0_we <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
+                p1_iALU | p1_iALUi) & (p1_rd_a!=0);
+    buf0_d  <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
+                p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? alu_o   : 0;
+  end
+end
+
+always_ff@(posedge clk or negedge rstn) begin: p3_reg_commit
+  if(!rstn) begin
     buf1_a  <= 0;
+    buf1_we <= 0;
     buf1_d  <= 0;
+  end else if(!stall2) begin
+    buf1_a  <= buf0_a;
+    buf1_we <= buf0_we;
+    buf1_d  <= buf0_d;
+  end
+end
+
+always_ff@(posedge clk or negedge rstn) begin: p4_reg_commit
+  if(!rstn) begin
     buf2_we <= 0;
     buf2_a  <= 0;
     buf2_d  <= 0;
   end else begin
-    if(flush1) begin
-      buf0_we <= 0;
-      buf0_a  <= 0;
-    end else if(!stall1) begin
-      buf0_we <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
-                  p1_iALU | p1_iALUi) & (p1_rd_a!=0);
-      buf0_a  <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
-                  p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? p1_rd_a : 0;
-      buf0_d  <= (p1_iLUI | p1_iAUIPC | p1_iJAL | p1_iJALR |
-                  p1_iALU | p1_iALUi) & (p1_rd_a!=0) ? alu_o   : 0;
-    end
-    if(!stall2) begin
-      buf1_we <=  buf0_we;
-      buf1_a  <=  buf0_a;
-      buf1_d  <=  buf0_d;
-    end
-
-    buf2_we <=  buf1_we;
     buf2_a  <=  buf1_a;
-    buf2_d  <=  buf1_d;
+    buf2_we <=  p3_iLD  | buf1_we;
+    buf2_d  <= (p3_iLD) ? lsu_rd : buf1_d;
   end
 end
 
-always_comb begin: write_regfile_ctrl
+always_comb begin: p4_ctrl_write_regfile
   rf_rd_e = buf2_we;
   rf_rd_a = buf2_a;
   rf_rd_i = buf2_d; 

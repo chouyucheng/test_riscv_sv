@@ -127,26 +127,29 @@ initial begin: monitor_ins
 //              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
 //              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
 //              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
+    // load ins
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
     // store word
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
 //              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
 //              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-              core0.u_exe0.p1_iLUI,
-              core0.u_exe0.p1_iAUIPC,
-              core0.u_exe0.p1_iJAL,
-              core0.u_exe0.p1_iJALR,
-              core0.u_exe0.p1_iB,
-              core0.u_exe0.p1_iLD,
-              core0.u_exe0.p1_iST,
-              core0.u_exe0.p1_iALUi,
-              core0.u_exe0.p1_iALU,
-              core0.u_exe0.p1_iF,
-              core0.u_exe0.p1_iE,
-              core0.u_exe0.p1_iCSR);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+//              core0.u_exe0.p1_iLUI,
+//              core0.u_exe0.p1_iAUIPC,
+//              core0.u_exe0.p1_iJAL,
+//              core0.u_exe0.p1_iJALR,
+//              core0.u_exe0.p1_iB,
+//              core0.u_exe0.p1_iLD,
+//              core0.u_exe0.p1_iST,
+//              core0.u_exe0.p1_iALUi,
+//              core0.u_exe0.p1_iALU,
+//              core0.u_exe0.p1_iF,
+//              core0.u_exe0.p1_iE,
+//              core0.u_exe0.p1_iCSR);
     i=i+1;
     @(posedge clk) #1;
   end
@@ -161,6 +164,7 @@ initial begin: monitor_instruction
   integer ins3, ins4, ins5, ins6, ins7;
   integer             adr5, adr6, adr7;
   integer             wd5,  wd6,  wd7;
+  integer                   rd6,  rd7;
 
   cnt = 1;
   fn = $fopen("do_ins.txt","w");
@@ -196,6 +200,7 @@ initial begin: monitor_instruction
       ins6 <= ins5;
       adr6 <= adr5;
       wd6  <= wd5;
+      rd6  <= core0.lsu_rd;
     end
     forever @(posedge clk) begin: pipe7_commit
       vld7 <= vld6;
@@ -203,6 +208,7 @@ initial begin: monitor_instruction
       ins7 <= ins6;
       adr7 <= adr6;
       wd7  <= wd6;
+      rd7  <= rd6;
     end
     forever @(posedge clk) begin: output_instructin 
       if(cnt== 91)   $fwrite(fn, "skip1--------\n");
@@ -213,7 +219,7 @@ initial begin: monitor_instruction
       else if(vld7) begin 
         $fwrite(fn, "%d ", cnt[15:0]);
         $fwrite(fn, "%h ", pc7);
-        fwrite_instruction(fn, pc7, ins7, adr7, wd7);
+        fwrite_instruction(fn, pc7, ins7, adr7, wd7, rd7);
         $fwrite(fn, "\n");
       end 
       cnt = cnt + 1;
@@ -226,7 +232,8 @@ input [31:0] fn,
 input [31:0] pc,
 input [31:0] ins,
 input [31:0] adr,
-input [31:0] wd
+input [31:0] wd,
+input [31:0] rd
 ); begin
   logic [4:0]  rs1_a;
   logic [4:0]  rs2_a_shamt;
@@ -285,12 +292,19 @@ input [31:0] wd
     fw_reg_name(fn, rs2_a_shamt);
     $fwrite(fn, "0x%h, ", pc+bimm);
   end
+  if(opcode==7'b0000011) begin
+    if(funct3==3'b010) $fwrite(fn, "LW,    ");
+    fw_reg_name(fn, rd_a);
+    fw_reg_name(fn, rs1_a);
+    $fwrite(fn, "0x%h, ", iimm);
+    $fwrite(fn, "sram1\[0x%h\]=>0x%h", adr, rd);
+  end
   if(opcode==7'b0100011) begin
     if(funct3==3'b010) $fwrite(fn, "SW,    ");
     fw_reg_name(fn, rs2_a_shamt);
     fw_reg_name(fn, rs1_a);
     $fwrite(fn, "0x%h, ", simm);
-    $fwrite(fn, "sram1\[0x%h\]=0x%h", adr, wd);
+    $fwrite(fn, "sram1\[0x%h\]<=0x%h", adr, wd);
   end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");

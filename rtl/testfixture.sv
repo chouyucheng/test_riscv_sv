@@ -68,7 +68,7 @@ end
 initial begin: sram1_model
   // init
   integer i;
-  for (i=0;i<65536;i=i+1) sram1[i] = 0;
+  //for (i=0;i<65536;i=i+1) sram1[i] = 0;
   sram1_we = 0;
 
   @(posedge rstn) fork
@@ -89,6 +89,7 @@ initial begin: sram1_model
       if(sram1_re[1]) sram1_rd[ 8+:8] = sram1[sram1_a][ 8+:8];
       if(sram1_re[2]) sram1_rd[16+:8] = sram1[sram1_a][16+:8];
       if(sram1_re[3]) sram1_rd[24+:8] = sram1[sram1_a][24+:8];
+      dat_rd = sram1_rd;
     end
   join
   //for (i=0;i<10;i=i+1) $display("%h", sram0[i]);
@@ -108,7 +109,7 @@ core core0(
 );
 
 `ifdef MONITOR_ON
-initial begin: monitor_ins
+initial begin: monitor_core
   integer i;
   i = 1;
 
@@ -155,6 +156,70 @@ initial begin: monitor_ins
   end
 end
 `endif
+
+initial begin: dump_sram1
+  integer cnt;
+  integer fn;
+
+  cnt = 1;
+  #1 @(posedge rstn);
+
+  forever @(posedge clk) begin
+    #1;
+    if(cnt==14800-1) begin
+      fn = $fopen("dump_sram1.txt", "w");
+      $fwrite(fn, "cyc %4d-1\n", cnt+1);
+      fwrite_sram1(fn);
+      $fclose(fn);
+      break;
+    end
+    cnt = cnt + 1;
+  end
+  $display("dump_sram1 break");
+end
+
+task fwrite_sram1 (
+input [31:0] fn
+); begin
+  integer i, ed;
+  integer ad1, ad2, dat; 
+
+  ed = 2**14;
+  $fwrite(fn, "  address , data\n");
+  for(i=0;i<ed;i++) begin
+    if(i==0) begin
+      $fwrite(fn, "0x%h, ", i*4);
+      ad1 = 0;
+      ad2 = ad1 + 4;
+      dat = sram1[0];
+    end else if(  i== ed-1     &
+                dat===sram1[i] & i*4==ad1+4 & i==(2**14)-1) begin
+      $fwrite(fn, "\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
+    end else if(  i== ed-1     &
+                dat===sram1[i] & i*4!=ad1+4 & i==(2**14)-1) begin
+      $fwrite(fn, "\n ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
+    end else if(dat===sram1[i]) begin
+      ad2 = i*4;
+    end else if(dat!==sram1[i] & i*4==ad1+4) begin
+      $fwrite(fn, "0x%h\n", dat);
+      $fwrite(fn, "0x%h, ", i*4);
+      ad1 = i*4;
+      ad2 = ad1 + 4;
+      dat = sram1[i];
+      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
+    end else if(dat!==sram1[i] & i*4!=ad1+4) begin
+      $fwrite(fn, "\n ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", ad2, dat);
+      $fwrite(fn, "0x%h, ", i*4);
+      ad1 = i*4;
+      ad2 = ad1 + 4;
+      dat = sram1[i];
+      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
+    end
+  end
+end endtask
 
 initial begin: monitor_instruction
   integer cnt;

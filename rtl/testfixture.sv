@@ -178,46 +178,64 @@ initial begin: dump_sram1
   $display("dump_sram1 break");
 end
 
+//task fwrite_sram1 (
+//input [31:0] fn
+//); begin
+//  integer i, ed;
+//  integer ad1, ad2, dat; 
+//
+//  ed = 2**14;
+//  $fwrite(fn, "  address , data\n");
+//  for(i=0;i<ed;i++) begin
+//    if(i==0) begin
+//      $fwrite(fn, "0x%h, ", i*4);
+//      ad1 = 0;
+//      ad2 = ad1 + 4;
+//      dat = sram1[0];
+//    end else if(  i== ed-1     &
+//                dat===sram1[i] & i*4==ad1+4 & i==(2**14)-1) begin
+//      $fwrite(fn, "\n");
+//      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
+//    end else if(  i== ed-1     &
+//                dat===sram1[i] & i*4!=ad1+4 & i==(2**14)-1) begin
+//      $fwrite(fn, "\n ~\n");
+//      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
+//    end else if(dat===sram1[i]) begin
+//      ad2 = i*4;
+//    end else if(dat!==sram1[i] & i*4==ad1+4) begin
+//      $fwrite(fn, "0x%h\n", dat);
+//      $fwrite(fn, "0x%h, ", i*4);
+//      ad1 = i*4;
+//      ad2 = ad1 + 4;
+//      dat = sram1[i];
+//      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
+//    end else if(dat!==sram1[i] & i*4!=ad1+4) begin
+//      $fwrite(fn, "\n ~\n");
+//      $fwrite(fn, "0x%h, 0x%h\n", ad2, dat);
+//      $fwrite(fn, "0x%h, ", i*4);
+//      ad1 = i*4;
+//      ad2 = ad1 + 4;
+//      dat = sram1[i];
+//      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
+//    end
+//  end
+//end endtask
+
 task fwrite_sram1 (
 input [31:0] fn
 ); begin
-  integer i, ed;
-  integer ad1, ad2, dat; 
+  integer i, adr;
+  integer state;
 
-  ed = 2**14;
   $fwrite(fn, "  address , data\n");
-  for(i=0;i<ed;i++) begin
+  for(i=0,adr=0;i<2**14;i=i+1,adr=adr+4) begin
     if(i==0) begin
-      $fwrite(fn, "0x%h, ", i*4);
-      ad1 = 0;
-      ad2 = ad1 + 4;
-      dat = sram1[0];
-    end else if(  i== ed-1     &
-                dat===sram1[i] & i*4==ad1+4 & i==(2**14)-1) begin
-      $fwrite(fn, "\n");
-      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
-    end else if(  i== ed-1     &
-                dat===sram1[i] & i*4!=ad1+4 & i==(2**14)-1) begin
-      $fwrite(fn, "\n ~\n");
-      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
-    end else if(dat===sram1[i]) begin
-      ad2 = i*4;
-    end else if(dat!==sram1[i] & i*4==ad1+4) begin
-      $fwrite(fn, "0x%h\n", dat);
-      $fwrite(fn, "0x%h, ", i*4);
-      ad1 = i*4;
-      ad2 = ad1 + 4;
-      dat = sram1[i];
-      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
-    end else if(dat!==sram1[i] & i*4!=ad1+4) begin
-      $fwrite(fn, "\n ~\n");
-      $fwrite(fn, "0x%h, 0x%h\n", ad2, dat);
-      $fwrite(fn, "0x%h, ", i*4);
-      ad1 = i*4;
-      ad2 = ad1 + 4;
-      dat = sram1[i];
-      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
-    end
+      state = 0; // print address
+    end else if(i==1 & sram1[1]!=sram1[0]) begin
+      $fwrite(fn, "0x%h\n", sram1[0]);
+      $fwrite(fn, "0x%h, ", adr);
+    end else if(sram1[i]!=sram1[i-1] & sram1[i-1]==)
+    
   end
 end endtask
 

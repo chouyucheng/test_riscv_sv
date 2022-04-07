@@ -15,7 +15,7 @@ logic        sram0_e;
 logic [31:0] sram0_o;
 
 logic [31:0] sram1 [0:(2**14)-1];
-logic [ 7:0] sram1_a;
+logic [13:0] sram1_a;
 logic [ 3:0] sram1_we;
 logic [31:0] sram1_wd;
 logic [ 3:0] sram1_re;
@@ -52,7 +52,7 @@ initial begin: sram0_model
 
   @(posedge rstn) fork
     forever@(posedge clk) begin
-      sram0_a <= ins_a[7+2:2];
+      sram0_a <= ins_a[13+2:2];
       sram0_e <= ins_e;
     end
     forever@(*) begin
@@ -73,7 +73,7 @@ initial begin: sram1_model
 
   @(posedge rstn) fork
     forever@(posedge clk) begin
-      sram1_a  <= dat_a[7+2:2];
+      sram1_a  <= dat_a[13+2:2];
       sram1_we <= dat_we;
       sram1_wd <= dat_wd;
       sram1_re <= dat_re;
@@ -162,19 +162,17 @@ initial begin: dump_sram1
   integer fn;
 
   cnt = 1;
+  fn = $fopen("dump_sram1.txt", "w");
   #1 @(posedge rstn);
 
   forever @(posedge clk) begin
     #1;
-    if(cnt==14800-1) begin
-      fn = $fopen("dump_sram1.txt", "w");
-      $fwrite(fn, "cyc %4d-1\n", cnt+1);
-      fwrite_sram1(fn);
-      $fclose(fn);
-      break;
-    end
+    if(cnt==14704-2) fwrite_sram1(cnt, fn);
+    if(cnt==14705-2) fwrite_sram1(cnt, fn);
+    if(cnt==14705-2) break;
     cnt = cnt + 1;
   end
+  $fclose(fn);
   $display("dump_sram1 break");
 end
 
@@ -222,20 +220,50 @@ end
 //end endtask
 
 task fwrite_sram1 (
+input [31:0] cnt,
 input [31:0] fn
 ); begin
-  integer i, adr;
+  integer i, ed;
   integer state;
 
+  //header
+  $fwrite(fn, "cyc %4d-2\n", cnt+2);
   $fwrite(fn, "  address , data\n");
-  for(i=0,adr=0;i<2**14;i=i+1,adr=adr+4) begin
+
+  ed = 2**14;
+  for(i=0;i<ed;i=i+1) begin
     if(i==0) begin
-      state = 0; // print address
-    end else if(i==1 & sram1[1]!=sram1[0]) begin
-      $fwrite(fn, "0x%h\n", sram1[0]);
-      $fwrite(fn, "0x%h, ", adr);
-    end else if(sram1[i]!=sram1[i-1] & sram1[i-1]==)
-    
+      $fwrite(fn, "0x%h, ", i*4); //addr
+      state = "DIFF"; 
+    end else if(sram1[i]===sram1[i-1]) begin
+      state = state=="DIFF" ? "SAM1" : "SAM2";
+    end else if(state=="DIFF") begin
+      $fwrite(fn, "0x%h\n", sram1[i-1]); //data
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+    end else if(state=="SAM1") begin
+      $fwrite(fn, "0x%h\n", sram1[i-1]); //data
+      $fwrite(fn, "0x%h, 0x%h\n", i*4-4, sram1[i-1]); 
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+      state = "DIFF"; 
+    end else if(state=="SAM2") begin
+      $fwrite(fn, "0x%h\n", sram1[i-1]); //data
+      $fwrite(fn, " ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4-4, sram1[i-1]); 
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+      state = "DIFF"; 
+    end
+   
+    if(i!=ed-1) begin
+    end else if(state=="DIFF") begin
+      $fwrite(fn, "0x%h\n", sram1[i]); //data
+    end else if(state=="SAM1") begin
+      $fwrite(fn, "0x%h\n", sram1[i-1]); //data
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, sram1[i]); 
+    end else if(state=="SAM2") begin
+      $fwrite(fn, "0x%h\n", sram1[i-1]); //data
+      $fwrite(fn, " ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, sram1[i]); 
+    end
   end
 end endtask
 

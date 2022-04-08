@@ -167,9 +167,11 @@ initial begin: dump_sram1
 
   forever @(posedge clk) begin
     #1;
-    if(cnt==14704-2) fwrite_sram1(cnt, fn);
-    if(cnt==14705-2) fwrite_sram1(cnt, fn);
-    if(cnt==14705-2) break;
+    //if(cnt==14653-2) fwrite_sram1(cnt, fn);
+    //if(cnt==14655-2) fwrite_sram1(cnt, fn);
+    //if(cnt==14655-2) break;
+    if(cnt>=14655-7 && cnt<=14655)
+      $fwrite(fn, "%d 0x%h\n", cnt[15:0], sram1[10]);
     cnt = cnt + 1;
   end
   $fclose(fn);

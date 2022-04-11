@@ -171,7 +171,7 @@ initial begin: dump_sram1
     //if(cnt==14655-2) fwrite_sram1(cnt, fn);
     //if(cnt==14655-2) break;
     if(cnt>=14655-7 && cnt<=14655)
-      $fwrite(fn, "%d 0x%h\n", cnt[15:0], sram1[10]);
+      $fwrite(fn, "%d 0x%h 0x%h\n", cnt[15:0], sram1[10], sram1_wd);
     cnt = cnt + 1;
   end
   $fclose(fn);

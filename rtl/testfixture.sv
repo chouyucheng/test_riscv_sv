@@ -1,5 +1,7 @@
 `timescale 1ns/10ps
-`define MONITOR_ON
+//`define MONITOR_ON
+//`define MONITOR_RF_ON
+//`define DUMP_SRAM1_ON
 //`define WAVE_ON
 
 module testfixture;
@@ -115,11 +117,11 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14619-8) begin
-    i=i+1;
-    @(posedge clk) #1;
+  repeat(14654-8) @(posedge clk) begin
+    i = i+ 1;
   end
-  repeat(20) begin
+  repeat(20) @(posedge clk) begin
+    #1;
 //    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
 //              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
 //    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
@@ -129,13 +131,13 @@ initial begin: monitor_core
 //              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
 //              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
     // load ins
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
     // store word
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
-//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
-//              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
-//              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
+              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
+              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
+              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
@@ -152,11 +154,11 @@ initial begin: monitor_core
 //              core0.u_exe0.p1_iE,
 //              core0.u_exe0.p1_iCSR);
     i=i+1;
-    @(posedge clk) #1;
   end
 end
 `endif
 
+`ifdef DUMP_SRAM1_ON
 initial begin: dump_sram1
   integer cnt;
   integer fn;
@@ -167,59 +169,18 @@ initial begin: dump_sram1
 
   forever @(posedge clk) begin
     #1;
-    //if(cnt==14653-2) fwrite_sram1(cnt, fn);
-    //if(cnt==14655-2) fwrite_sram1(cnt, fn);
-    //if(cnt==14655-2) break;
-    if(cnt>=14655-7 && cnt<=14655)
-      $fwrite(fn, "%d 0x%h 0x%h\n", cnt[15:0], sram1[10], sram1_wd);
+    if(cnt==14653-2) fwrite_sram1(cnt, fn);
+    if(cnt==14654-2) fwrite_sram1(cnt, fn);
+    if(cnt==14654-2) break;
+    //if(cnt>=14654-7 && cnt<=14654)
+    //  $fwrite(fn, "%d 0x%h s0x%h d0x%h cd0x%h ced0.x%h\n", 
+    //          cnt[15:0], sram1[10], sram1_wd, dat_wd, core0.lsu_wd, core0.u_exe0.lsu_wd);
     cnt = cnt + 1;
   end
   $fclose(fn);
   $display("dump_sram1 break");
 end
-
-//task fwrite_sram1 (
-//input [31:0] fn
-//); begin
-//  integer i, ed;
-//  integer ad1, ad2, dat; 
-//
-//  ed = 2**14;
-//  $fwrite(fn, "  address , data\n");
-//  for(i=0;i<ed;i++) begin
-//    if(i==0) begin
-//      $fwrite(fn, "0x%h, ", i*4);
-//      ad1 = 0;
-//      ad2 = ad1 + 4;
-//      dat = sram1[0];
-//    end else if(  i== ed-1     &
-//                dat===sram1[i] & i*4==ad1+4 & i==(2**14)-1) begin
-//      $fwrite(fn, "\n");
-//      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
-//    end else if(  i== ed-1     &
-//                dat===sram1[i] & i*4!=ad1+4 & i==(2**14)-1) begin
-//      $fwrite(fn, "\n ~\n");
-//      $fwrite(fn, "0x%h, 0x%h\n", i*4, dat);
-//    end else if(dat===sram1[i]) begin
-//      ad2 = i*4;
-//    end else if(dat!==sram1[i] & i*4==ad1+4) begin
-//      $fwrite(fn, "0x%h\n", dat);
-//      $fwrite(fn, "0x%h, ", i*4);
-//      ad1 = i*4;
-//      ad2 = ad1 + 4;
-//      dat = sram1[i];
-//      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
-//    end else if(dat!==sram1[i] & i*4!=ad1+4) begin
-//      $fwrite(fn, "\n ~\n");
-//      $fwrite(fn, "0x%h, 0x%h\n", ad2, dat);
-//      $fwrite(fn, "0x%h, ", i*4);
-//      ad1 = i*4;
-//      ad2 = ad1 + 4;
-//      dat = sram1[i];
-//      if(i==(2**14)-1) $fwrite(fn, "0x%h\n", dat);
-//    end
-//  end
-//end endtask
+`endif
 
 task fwrite_sram1 (
 input [31:0] cnt,
@@ -324,6 +285,7 @@ initial begin: monitor_instruction
       rd7  <= rd6;
     end
     forever @(posedge clk) begin: output_instructin 
+      #1;
       if(cnt== 91)   $fwrite(fn, "skip1--------\n");
       if(cnt== 7278) $fwrite(fn, "skip2--------\n");
 
@@ -485,6 +447,7 @@ input [4:0]  reg_adr
   endcase
 end endtask
 
+`ifdef MONITOR_RF_ON
 initial begin: monitor_regfile
   integer i, j, fn;
   integer rf_rd_e, rf_rd_a; 
@@ -507,6 +470,7 @@ initial begin: monitor_regfile
   end
 
 end
+`endif
 
 `ifdef WAVE_ON
 initial begin: dump_fsdb

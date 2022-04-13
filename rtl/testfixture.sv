@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-//`define MONITOR_ON
+`define MONITOR_ON
 //`define MONITOR_RF_ON
 //`define DUMP_SRAM1_ON
 //`define WAVE_ON
@@ -117,7 +117,7 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14654-8) @(posedge clk) begin
+  repeat(14676-8) @(posedge clk) begin
     i = i+ 1;
   end
   repeat(20) @(posedge clk) begin
@@ -134,25 +134,25 @@ initial begin: monitor_core
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
     // store word
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
-              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
-              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
-              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
+//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
+//              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
+//              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
-//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-//              core0.u_exe0.p1_iLUI,
-//              core0.u_exe0.p1_iAUIPC,
-//              core0.u_exe0.p1_iJAL,
-//              core0.u_exe0.p1_iJALR,
-//              core0.u_exe0.p1_iB,
-//              core0.u_exe0.p1_iLD,
-//              core0.u_exe0.p1_iST,
-//              core0.u_exe0.p1_iALUi,
-//              core0.u_exe0.p1_iALU,
-//              core0.u_exe0.p1_iF,
-//              core0.u_exe0.p1_iE,
-//              core0.u_exe0.p1_iCSR);
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              core0.u_exe0.p1_iLUI,
+              core0.u_exe0.p1_iAUIPC,
+              core0.u_exe0.p1_iJAL,
+              core0.u_exe0.p1_iJALR,
+              core0.u_exe0.p1_iB,
+              core0.u_exe0.p1_iLD,
+              core0.u_exe0.p1_iST,
+              core0.u_exe0.p1_iALUi,
+              core0.u_exe0.p1_iALU,
+              core0.u_exe0.p1_iF,
+              core0.u_exe0.p1_iE,
+              core0.u_exe0.p1_iCSR);
     i=i+1;
   end
 end
@@ -383,6 +383,14 @@ input [31:0] rd
   end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");
+    if(funct3==3'b010) $fwrite(fn, "SLTI,  ");
+    if(funct3==3'b011) $fwrite(fn, "SLTIU, ");
+    if(funct3==3'b100) $fwrite(fn, "XORI,  ");
+    if(funct3==3'b110) $fwrite(fn, "ORI,   ");
+    if(funct3==3'b111) $fwrite(fn, "ANDI,  ");
+    if(funct3==3'b001 & !funct7[5]) $fwrite(fn, "SLLI,  ");
+    if(funct3==3'b101 & !funct7[5]) $fwrite(fn, "SRLI,  ");
+    if(funct3==3'b101 &  funct7[5]) $fwrite(fn, "SRAI,  ");
     fw_reg_name(fn, rd_a);
     fw_reg_name(fn, rs1_a);
     $fwrite(fn, "0x%h, ", iimm);

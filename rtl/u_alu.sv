@@ -3,6 +3,7 @@ input        [3:0]  alu_op,
 input        [31:0] alu_i1,
 input        [31:0] alu_i2,
 output logic [31:0] alu_o,
+output logic        alu_eq,
 output logic        alu_lt,
 output logic        alu_ltu
 );
@@ -27,9 +28,10 @@ always_comb begin: unsigned_to_signed
   sig_i2 = alu_i2;
 end
 
-always_comb begin: less_than
-  alu_lt  = (sig_i1 < sig_i2); 
-  alu_ltu = (alu_i1 < alu_i2); 
+always_comb begin: compare_for_branch
+  alu_eq  = (alu_i1 == alu_i2);
+  alu_lt  = (sig_i1 <  sig_i2); 
+  alu_ltu = (alu_i1 <  alu_i2); 
 end
 
 always_comb begin: alu_output

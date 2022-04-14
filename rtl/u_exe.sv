@@ -45,6 +45,7 @@ output logic [3:0]  alu_op,
 output logic [31:0] alu_i1,
 output logic [31:0] alu_i2,
 input        [31:0] alu_o,
+input               alu_eq,
 input               alu_lt,
 input               alu_ltu,
 // csr
@@ -186,7 +187,12 @@ end
 always_comb begin: p1_ctrl_branch
   branch = (p1_iJAL)  | 
            (p1_iJALR) |
-           (p1_iB & p1_f3==3'b110 & alu_ltu);
+           (p1_iB & p1_f3==3'b000 &  alu_eq)           |
+           (p1_iB & p1_f3==3'b001 & !alu_eq)           |
+           (p1_iB & p1_f3==3'b100 &            alu_lt) | 
+           (p1_iB & p1_f3==3'b101 & !alu_eq & !alu_lt) |
+           (p1_iB & p1_f3==3'b110 &            alu_ltu)|
+           (p1_iB & p1_f3==3'b111 & !alu_eq & !alu_ltu);
 end
 
 always_comb begin: p1_ctrl_branch_adr

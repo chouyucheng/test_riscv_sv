@@ -76,6 +76,7 @@ logic [3:0]  alu_op;
 logic [31:0] alu_i1;
 logic [31:0] alu_i2;
 logic [31:0] alu_o;
+logic        alu_eq;
 logic        alu_lt;
 logic        alu_ltu;
 
@@ -187,6 +188,7 @@ u_exe u_exe0 (
 .alu_i1      (alu_i1     ),
 .alu_i2      (alu_i2     ),
 .alu_o       (alu_o      ), 
+.alu_eq      (alu_eq     ),
 .alu_lt      (alu_lt     ),
 .alu_ltu     (alu_ltu    ),
 // csr
@@ -226,6 +228,7 @@ u_alu u_alu0(
 .alu_i1  (alu_i1 ),
 .alu_i2  (alu_i2 ),
 .alu_o   (alu_o  ), 
+.alu_eq  (alu_eq ),
 .alu_lt  (alu_lt ),
 .alu_ltu (alu_ltu)
 );

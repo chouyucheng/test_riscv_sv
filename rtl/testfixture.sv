@@ -117,8 +117,8 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14676-8) @(posedge clk) begin
-    i = i+ 1;
+  repeat(14972-8) @(posedge clk) begin
+    i = i + 1;
   end
   repeat(20) @(posedge clk) begin
     #1;
@@ -130,7 +130,11 @@ initial begin: monitor_core
 //              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
 //              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
 //              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
-    // load ins
+    // branch 
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              core0.u_exe0.p1_iB, core0.u_exe0.p1_f3);
+    // load word
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
     // store word
@@ -139,20 +143,20 @@ initial begin: monitor_core
 //              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-              core0.u_exe0.p1_iLUI,
-              core0.u_exe0.p1_iAUIPC,
-              core0.u_exe0.p1_iJAL,
-              core0.u_exe0.p1_iJALR,
-              core0.u_exe0.p1_iB,
-              core0.u_exe0.p1_iLD,
-              core0.u_exe0.p1_iST,
-              core0.u_exe0.p1_iALUi,
-              core0.u_exe0.p1_iALU,
-              core0.u_exe0.p1_iF,
-              core0.u_exe0.p1_iE,
-              core0.u_exe0.p1_iCSR);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+//              core0.u_exe0.p1_iLUI,
+//              core0.u_exe0.p1_iAUIPC,
+//              core0.u_exe0.p1_iJAL,
+//              core0.u_exe0.p1_iJALR,
+//              core0.u_exe0.p1_iB,
+//              core0.u_exe0.p1_iLD,
+//              core0.u_exe0.p1_iST,
+//              core0.u_exe0.p1_iALUi,
+//              core0.u_exe0.p1_iALU,
+//              core0.u_exe0.p1_iF,
+//              core0.u_exe0.p1_iE,
+//              core0.u_exe0.p1_iCSR);
     i=i+1;
   end
 end
@@ -362,7 +366,12 @@ input [31:0] rd
     $fwrite(fn, "0x%h, ", iimm);
   end
   if(opcode==7'b1100011) begin
+    if(funct3==3'b000) $fwrite(fn, "BEQ,   ");
+    if(funct3==3'b001) $fwrite(fn, "BNE,   ");
+    if(funct3==3'b100) $fwrite(fn, "BLT,   ");
+    if(funct3==3'b101) $fwrite(fn, "BGE,   ");
     if(funct3==3'b110) $fwrite(fn, "BLTU,  ");
+    if(funct3==3'b111) $fwrite(fn, "BGEU,  ");
     fw_reg_name(fn, rs1_a);
     fw_reg_name(fn, rs2_a_shamt);
     $fwrite(fn, "0x%h, ", pc+bimm);
@@ -489,7 +498,7 @@ end
 `endif
 
 initial begin: WDT
-  #(15000 * 10);
+  #(30000 * 10);
   $display("The dog is coming, shutdown");
   $finish;
 end

@@ -1,7 +1,7 @@
 `timescale 1ns/10ps
-`define MONITOR_ON
+//`define MONITOR_ON
 //`define MONITOR_RF_ON
-//`define DUMP_SRAM1_ON
+`define DUMP_SRAM_ON
 //`define WAVE_ON
 
 module testfixture;
@@ -12,6 +12,7 @@ logic [ 7:0] sram0_0 [0:(2**14)-1];
 logic [ 7:0] sram0_1 [0:(2**14)-1];
 logic [ 7:0] sram0_2 [0:(2**14)-1];
 logic [ 7:0] sram0_3 [0:(2**14)-1];
+logic [31:0] sram0   [0:(2**14)-1];
 logic [13:0] sram0_a;
 logic        sram0_e;
 logic [31:0] sram0_o;
@@ -45,11 +46,18 @@ initial begin: reset
 end
 
 initial begin: sram0_model
+  integer i;
   // init
   $readmemh("../../test_compile/prog0/sram_0_0.hex", sram0_0);
   $readmemh("../../test_compile/prog0/sram_0_1.hex", sram0_1);
   $readmemh("../../test_compile/prog0/sram_0_2.hex", sram0_2);
   $readmemh("../../test_compile/prog0/sram_0_3.hex", sram0_3);
+  for(i=0;i<2**14;i=i+1) begin
+    sram0[i][ 0+:8] = sram0_0[i];
+    sram0[i][ 8+:8] = sram0_1[i];
+    sram0[i][16+:8] = sram0_2[i];
+    sram0[i][24+:8] = sram0_3[i];
+  end
   ins = 0;
 
   @(posedge rstn) fork
@@ -58,10 +66,7 @@ initial begin: sram0_model
       sram0_e <= ins_e;
     end
     forever@(*) begin
-      if(sram0_e) sram0_o[ 0+:8] = sram0_0[sram0_a];
-      if(sram0_e) sram0_o[ 8+:8] = sram0_1[sram0_a];
-      if(sram0_e) sram0_o[16+:8] = sram0_2[sram0_a];
-      if(sram0_e) sram0_o[24+:8] = sram0_3[sram0_a];
+      if(sram0_e) sram0_o = sram0[sram0_a];
       ins = sram0_o;
     end
   join
@@ -109,6 +114,19 @@ core core0(
 .dat_re (dat_re),
 .dat_rd (dat_rd)
 );
+
+integer fflag;
+
+initial begin: finish_prog
+  fflag = 0;
+  @(posedge rstn);
+  forever@(posedge clk) #1 if(sram1[1023]==1) begin
+    fflag = 1; 
+    break;
+  end
+  repeat(10) @(posedge clk) #1;
+  $finish; 
+end
 
 `ifdef MONITOR_ON
 initial begin: monitor_core
@@ -162,29 +180,82 @@ initial begin: monitor_core
 end
 `endif
 
-`ifdef DUMP_SRAM1_ON
-initial begin: dump_sram1
+`ifdef DUMP_SRAM_ON
+initial begin: dump_sram
   integer cnt;
-  integer fn;
+  integer fn0, fn1;
 
   cnt = 1;
-  fn = $fopen("dump_sram1.txt", "w");
+  fn0 = $fopen("dump_sram0.txt", "w");
+  fn1 = $fopen("dump_sram1.txt", "w");
   #1 @(posedge rstn);
+  fwrite_sram0(cnt, fn0);
 
   forever @(posedge clk) begin
     #1;
-    if(cnt==14653-2) fwrite_sram1(cnt, fn);
-    if(cnt==14654-2) fwrite_sram1(cnt, fn);
-    if(cnt==14654-2) break;
+    if(fflag==1) fwrite_sram1(cnt, fn1);
+    if(fflag==1) break;
+    //if(cnt==14653-2) fwrite_sram1(cnt, fn);
+    //if(cnt==14654-2) fwrite_sram1(cnt, fn);
+    //if(cnt==14654-2) break;
     //if(cnt>=14654-7 && cnt<=14654)
     //  $fwrite(fn, "%d 0x%h s0x%h d0x%h cd0x%h ced0.x%h\n", 
     //          cnt[15:0], sram1[10], sram1_wd, dat_wd, core0.lsu_wd, core0.u_exe0.lsu_wd);
     cnt = cnt + 1;
   end
-  $fclose(fn);
-  $display("dump_sram1 break");
+  $fclose(fn0);
+  $fclose(fn1);
+  $display("dump_sram break");
 end
 `endif
+
+task fwrite_sram0 (
+input [31:0] cnt,
+input [31:0] fn
+); begin
+  integer i, ed;
+  integer state;
+
+  //header
+  $fwrite(fn, "cyc %4d-2\n", cnt+2);
+  $fwrite(fn, "  address , data\n");
+
+  ed = 2**14;
+  for(i=0;i<ed;i=i+1) begin
+    if(i==0) begin
+      $fwrite(fn, "0x%h, ", i*4); //addr
+      state = "DIFF"; 
+    end else if(sram0[i]===sram0[i-1]) begin
+      state = state=="DIFF" ? "SAM1" : "SAM2";
+    end else if(state=="DIFF") begin
+      $fwrite(fn, "0x%h\n", sram0[i-1]); //data
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+    end else if(state=="SAM1") begin
+      $fwrite(fn, "0x%h\n", sram0[i-1]); //data
+      $fwrite(fn, "0x%h, 0x%h\n", i*4-4, sram0[i-1]); 
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+      state = "DIFF"; 
+    end else if(state=="SAM2") begin
+      $fwrite(fn, "0x%h\n", sram0[i-1]); //data
+      $fwrite(fn, " ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4-4, sram0[i-1]); 
+      $fwrite(fn, "0x%h, ", i*4);        //addr
+      state = "DIFF"; 
+    end
+   
+    if(i!=ed-1) begin
+    end else if(state=="DIFF") begin
+      $fwrite(fn, "0x%h\n", sram0[i]); //data
+    end else if(state=="SAM1") begin
+      $fwrite(fn, "0x%h\n", sram0[i-1]); //data
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, sram0[i]); 
+    end else if(state=="SAM2") begin
+      $fwrite(fn, "0x%h\n", sram0[i-1]); //data
+      $fwrite(fn, " ~\n");
+      $fwrite(fn, "0x%h, 0x%h\n", i*4, sram0[i]); 
+    end
+  end
+end endtask
 
 task fwrite_sram1 (
 input [31:0] cnt,
@@ -489,6 +560,12 @@ initial begin: monitor_regfile
 end
 `endif
 
+initial begin: WDT
+  #(30000 * 10);
+  $display("The dog is coming, shutdown");
+  $finish;
+end
+
 `ifdef WAVE_ON
 initial begin: dump_fsdb
   $fsdbDumpfile("wave.fsdb");
@@ -497,11 +574,6 @@ initial begin: dump_fsdb
 end 
 `endif
 
-initial begin: WDT
-  #(30000 * 10);
-  $display("The dog is coming, shutdown");
-  $finish;
-end
 
 
 endmodule

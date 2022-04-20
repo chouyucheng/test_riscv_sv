@@ -184,23 +184,24 @@ end
 initial begin: dump_sram
   integer cnt;
   integer fn0, fn1;
+  integer flag;
 
   cnt = 1;
   fn0 = $fopen("dump_sram0.txt", "w");
   fn1 = $fopen("dump_sram1.txt", "w");
+  flag = 0;
   #1 @(posedge rstn);
   fwrite_sram0(cnt, fn0);
 
   forever @(posedge clk) begin
     #1;
-    if(fflag==1) fwrite_sram1(cnt, fn1);
+    if(cnt==14468-2) fwrite_sram1(cnt, fn1);
+    if(fflag==1)     fwrite_sram1(cnt, fn1);
     if(fflag==1) break;
-    //if(cnt==14653-2) fwrite_sram1(cnt, fn);
-    //if(cnt==14654-2) fwrite_sram1(cnt, fn);
-    //if(cnt==14654-2) break;
-    //if(cnt>=14654-7 && cnt<=14654)
-    //  $fwrite(fn, "%d 0x%h s0x%h d0x%h cd0x%h ced0.x%h\n", 
-    //          cnt[15:0], sram1[10], sram1_wd, dat_wd, core0.lsu_wd, core0.u_exe0.lsu_wd);
+    if(sram1[0]==32'hfffff004 && flag==0) begin
+      $display("sram1 adr0 cnt:%d",cnt[15:0]);
+      flag = 1;
+    end
     cnt = cnt + 1;
   end
   $fclose(fn0);
@@ -327,12 +328,12 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: pipe2_ins_mem_out
     end
     forever @(posedge clk) begin: pipe3_ins_reg_out
-      vld3 <= core0.ifu_vld & !core0.branch;
+      vld3 <= !core0.hzf_ex0;
       pc3  <= core0.ifu_pc;
       ins3 <= core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe4_exe
-      vld4 <= vld3;
+      vld4 <= !core0.hzf_ex1 & vld3;
       pc4  <= pc3;
       ins4 <= ins3;
     end

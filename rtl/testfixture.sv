@@ -2,7 +2,7 @@
 //`define MONITOR_ON
 //`define MONITOR_RF_ON
 `define DUMP_SRAM_ON
-//`define WAVE_ON
+`define WAVE_ON
 
 module testfixture;
 

@@ -1,5 +1,5 @@
 ncverilog(64): 15.20-s084: (c) Copyright 1995-2020 Cadence Design Systems, Inc.
-TOOL:	ncverilog	15.20-s084: Started on Apr 20, 2022 at 08:14:18 CST
+TOOL:	ncverilog	15.20-s084: Started on Apr 20, 2022 at 22:50:13 CST
 ncverilog
 	-f filelist.f
 		../rtl/testfixture.sv
@@ -15,8 +15,8 @@ ncverilog
 	+nc64bit
 	+access+r
 Recompiling... reason: file '../rtl/testfixture.sv' is newer than expected.
-	expected: Wed Apr 20 08:09:55 2022
-	actual:   Wed Apr 20 08:14:04 2022
+	expected: Wed Apr 20 22:39:19 2022
+	actual:   Wed Apr 20 22:50:06 2022
 file: ../rtl/testfixture.sv
 	module worklib.testfixture:sv
 		errors: 0, warnings: 0
@@ -25,10 +25,8 @@ file: ../rtl/testfixture.sv
 ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.core:sv <0x456d5e44>
-			streams: 102, words: 22305
-		worklib.testfixture:sv <0x2ed10aa9>
-			streams:  52, words: 116566
+		worklib.testfixture:sv <0x2e7418a2>
+			streams:  53, words: 117319
 	Building instance specific data structures.
 	Loading native compiled code:     .................... Done
 	Design hierarchy summary:
@@ -38,7 +36,7 @@ ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-
 		Scalar wires:            86       -
 		Vectored wires:          86       -
 		Always blocks:           27      27
-		Initial blocks:           8       8
+		Initial blocks:           9       9
 		Parallel blocks:          3       3
 		Cont. assignments:        1       1
 		Pseudo assignments:     110     110
@@ -49,9 +47,17 @@ ncsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009
 *Verdi* Loading libsscore_ius152.so
 ncsim> source /usr/cad/cadence/INCISIV/cur/tools/inca/files/ncsimrc
 ncsim> run
-sram1 adr0 cnt:15122
-dump_sram break
-Simulation complete via $finish(1) at time 152996 NS + 0
-../rtl/testfixture.sv:128   $finish; 
+FSDB Dumper for IUS, Release Verdi_O-2018.09, Linux x86_64/64bit, 08/30/2018
+(C) 1996 - 2018 by Synopsys, Inc.
+*Verdi* FSDB WARNING: The FSDB file already exists. Overwriting the FSDB file may crash the programs that are using this file.
+*Verdi* : Create FSDB file 'wave.fsdb'
+*Verdi* : Begin traversing the scopes, layer (0).
+*Verdi* : End of traversing.
+*Verdi* : Begin traversing the MDAs, layer (0).
+*Verdi* : Enable +mda and +packedmda dumping.
+*Verdi* : End of traversing the MDAs.
+The dog is coming, shutdown
+Simulation complete via $finish(1) at time 300 US + 0
+../rtl/testfixture.sv:567   $finish;
 ncsim> exit
-TOOL:	ncverilog	15.20-s084: Exiting on Apr 20, 2022 at 08:14:19 CST  (total: 00:00:01)
+TOOL:	ncverilog	15.20-s084: Exiting on Apr 20, 2022 at 22:50:16 CST  (total: 00:00:03)

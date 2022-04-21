@@ -24,8 +24,8 @@ logic [31:0] pc_p1;
 
 always_ff@(posedge clk or negedge rstn) begin: pipe0_reg_pc
   if(!rstn) pc <= 0;
-  else      pc <= stall  ? pc     : 
-                  branch ? br_adr : pc + 4;
+  else      pc <= branch ? br_adr :
+                  !stall ? pc + 4 : pc;
 end
 
 assign ins_e = 1;

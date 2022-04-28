@@ -1,5 +1,5 @@
 ncverilog(64): 15.20-s084: (c) Copyright 1995-2020 Cadence Design Systems, Inc.
-TOOL:	ncverilog	15.20-s084: Started on Apr 20, 2022 at 22:50:13 CST
+TOOL:	ncverilog	15.20-s084: Started on Apr 28, 2022 at 23:15:46 CST
 ncverilog
 	-f filelist.f
 		../rtl/testfixture.sv
@@ -15,8 +15,8 @@ ncverilog
 	+nc64bit
 	+access+r
 Recompiling... reason: file '../rtl/testfixture.sv' is newer than expected.
-	expected: Wed Apr 20 22:39:19 2022
-	actual:   Wed Apr 20 22:50:06 2022
+	expected: Thu Apr 28 23:12:50 2022
+	actual:   Thu Apr 28 23:15:44 2022
 file: ../rtl/testfixture.sv
 	module worklib.testfixture:sv
 		errors: 0, warnings: 0
@@ -25,18 +25,18 @@ file: ../rtl/testfixture.sv
 ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.testfixture:sv <0x2e7418a2>
-			streams:  53, words: 117319
+		worklib.testfixture:sv <0x5dcb1380>
+			streams:  54, words: 125781
 	Building instance specific data structures.
 	Loading native compiled code:     .................... Done
 	Design hierarchy summary:
 		                  Instances  Unique
 		Modules:                 10      10
-		Registers:              238     238
+		Registers:              241     241
 		Scalar wires:            86       -
 		Vectored wires:          86       -
 		Always blocks:           27      27
-		Initial blocks:           9       9
+		Initial blocks:          10      10
 		Parallel blocks:          3       3
 		Cont. assignments:        1       1
 		Pseudo assignments:     110     110
@@ -47,17 +47,28 @@ ncsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009
 *Verdi* Loading libsscore_ius152.so
 ncsim> source /usr/cad/cadence/INCISIV/cur/tools/inca/files/ncsimrc
 ncsim> run
-FSDB Dumper for IUS, Release Verdi_O-2018.09, Linux x86_64/64bit, 08/30/2018
-(C) 1996 - 2018 by Synopsys, Inc.
-*Verdi* FSDB WARNING: The FSDB file already exists. Overwriting the FSDB file may crash the programs that are using this file.
-*Verdi* : Create FSDB file 'wave.fsdb'
-*Verdi* : Begin traversing the scopes, layer (0).
-*Verdi* : End of traversing.
-*Verdi* : Begin traversing the MDAs, layer (0).
-*Verdi* : Enable +mda and +packedmda dumping.
-*Verdi* : End of traversing the MDAs.
+cyc 14840,pc 00000750,ins 0012e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
+cyc 14841,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
+cyc 14842,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
+cyc 14843,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld01]
+cyc 14844,pc 00000754,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi1 i_ALU0 F0 E0 CSR0 FnoD0 vld11]
+cyc 14845,pc 00000758,ins 0082e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR1 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld11]
+cyc 14846,pc 00000738,ins 00000317,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld10]
+cyc 14847,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
+cyc 14848,pc 0000073c,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
+cyc 14849,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
+cyc 14850,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
+cyc 14851,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
+cyc 14852,pc 00000740,ins 0042e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
+cyc 14853,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
+cyc 14854,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
+cyc 14855,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld01]
+cyc 14856,pc 00000744,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi1 i_ALU0 F0 E0 CSR0 FnoD0 vld11]
+cyc 14857,pc 00000748,ins 0102e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR1 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld11]
+cyc 14858,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld10]
+cyc 14859,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
 The dog is coming, shutdown
 Simulation complete via $finish(1) at time 300 US + 0
-../rtl/testfixture.sv:567   $finish;
+../rtl/testfixture.sv:581   $finish;
 ncsim> exit
-TOOL:	ncverilog	15.20-s084: Exiting on Apr 20, 2022 at 22:50:16 CST  (total: 00:00:03)
+TOOL:	ncverilog	15.20-s084: Exiting on Apr 28, 2022 at 23:15:47 CST  (total: 00:00:01)

@@ -1,8 +1,8 @@
 `timescale 1ns/10ps
-//`define MONITOR_ON
+`define MONITOR_ON
 //`define MONITOR_RF_ON
 `define DUMP_SRAM_ON
-`define WAVE_ON
+//`define WAVE_ON
 
 module testfixture;
 
@@ -115,6 +115,14 @@ core core0(
 .dat_rd (dat_rd)
 );
 
+integer glb_cnt;
+
+initial begin: global_counter
+  glb_cnt = 0;
+  @(posedge rstn);
+  forever@(posedge clk) glb_cnt = glb_cnt + 1;
+end
+
 integer fflag;
 
 initial begin: finish_prog
@@ -128,14 +136,16 @@ initial begin: finish_prog
   $finish; 
 end
 
+integer m_vld;
 `ifdef MONITOR_ON
 initial begin: monitor_core
   integer i;
   i = 1;
+  m_vld = 0;
 
   #1;
   @(posedge rstn);
-  repeat(14972-8) @(posedge clk) begin
+  repeat(14847-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin
@@ -149,9 +159,9 @@ initial begin: monitor_core
 //              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
 //              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
     // branch 
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-              core0.u_exe0.p1_iB, core0.u_exe0.p1_f3);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+//              core0.u_exe0.p1_iB, core0.u_exe0.p1_f3);
     // load word
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
@@ -161,20 +171,22 @@ initial begin: monitor_core
 //              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check opcode
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b]",
-//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-//              core0.u_exe0.p1_iLUI,
-//              core0.u_exe0.p1_iAUIPC,
-//              core0.u_exe0.p1_iJAL,
-//              core0.u_exe0.p1_iJALR,
-//              core0.u_exe0.p1_iB,
-//              core0.u_exe0.p1_iLD,
-//              core0.u_exe0.p1_iST,
-//              core0.u_exe0.p1_iALUi,
-//              core0.u_exe0.p1_iALU,
-//              core0.u_exe0.p1_iF,
-//              core0.u_exe0.p1_iE,
-//              core0.u_exe0.p1_iCSR);
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              core0.u_exe0.p1_iLUI,
+              core0.u_exe0.p1_iAUIPC,
+              core0.u_exe0.p1_iJAL,
+              core0.u_exe0.p1_iJALR,
+              core0.u_exe0.p1_iB,
+              core0.u_exe0.p1_iLD,
+              core0.u_exe0.p1_iST,
+              core0.u_exe0.p1_iALUi,
+              core0.u_exe0.p1_iALU,
+              core0.u_exe0.p1_iF,
+              core0.u_exe0.p1_iE,
+              core0.u_exe0.p1_iCSR,
+              core0.fwd_no_dat,
+              m_vld[4:3]);
     i=i+1;
   end
 end
@@ -328,12 +340,14 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: pipe2_ins_mem_out
     end
     forever @(posedge clk) begin: pipe3_ins_reg_out
-      vld3 <= !core0.hzf_ex0;
+      vld3     <= !core0.hzf_ex0;
+      m_vld[3] <= !core0.hzf_ex0;
       pc3  <= core0.ifu_pc;
       ins3 <= core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe4_exe
-      vld4 <= !core0.hzf_ex1 & vld3;
+      vld4     <= core0.branch | (!core0.hzf_ex1 & vld3);
+      m_vld[4] <= core0.branch | (!core0.hzf_ex1 & vld3);
       pc4  <= pc3;
       ins4 <= ins3;
     end

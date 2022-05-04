@@ -22,6 +22,8 @@ logic en_p1;
 logic [31:0] pc;
 logic [31:0] pc_p1;
 
+logic stall_d1;
+
 always_ff@(posedge clk or negedge rstn) begin: pipe0_reg_pc
   if(!rstn) pc <= 0;
   else      pc <= branch ? br_adr :
@@ -46,19 +48,27 @@ always_ff@(posedge clk or negedge rstn) begin: pipe1_reg
   end
 end
 
+always_ff@(posedge clk or negedge rstn) begin: reg_stall_delay1T
+  if(!rstn) stall_d1 <= 0;
+  else      stall_d1 <= stall;
+end
+
+always_ff@(posedge clk or negedge rstn) begin: pipe2_reg_ins
+  if(!rstn) ifu_ins <= 0;
+  else      ifu_ins <=  flush ? 0   : 
+                       !stall ? ins : ifu_ins;
+end
+
 always_ff@(posedge clk or negedge rstn) begin: pipe2_reg
   if(!rstn) begin
     ifu_vld <= 0;
     ifu_pc  <= 0;
-    ifu_ins <= 0;
   end else if(flush) begin
     ifu_vld <= 0;
     ifu_pc  <= 0;
-    ifu_ins <= 0;
   end else if(!stall)begin
     ifu_vld <= en_p1;
     ifu_pc  <= pc_p1;
-    ifu_ins <= ins;
   end
 end
 

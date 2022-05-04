@@ -1,5 +1,5 @@
 ncverilog(64): 15.20-s084: (c) Copyright 1995-2020 Cadence Design Systems, Inc.
-TOOL:	ncverilog	15.20-s084: Started on May 03, 2022 at 08:30:16 CST
+TOOL:	ncverilog	15.20-s084: Started on May 04, 2022 at 08:35:41 CST
 ncverilog
 	-f filelist.f
 		../rtl/testfixture.sv
@@ -14,28 +14,30 @@ ncverilog
 		../rtl/u_alu.sv
 	+nc64bit
 	+access+r
-Recompiling... reason: file '../rtl/testfixture.sv' is newer than expected.
-	expected: Thu Apr 28 23:15:44 2022
-	actual:   Tue May  3 08:30:09 2022
-file: ../rtl/testfixture.sv
-	module worklib.testfixture:sv
+Recompiling... reason: file '../rtl/u_ifu.sv' is newer than expected.
+	expected: Wed May  4 08:32:37 2022
+	actual:   Wed May  4 08:35:39 2022
+file: ../rtl/u_ifu.sv
+	module worklib.u_ifu:sv
 		errors: 0, warnings: 0
 		Caching library 'worklib' ....... Done
 	Elaborating the design hierarchy:
 ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.testfixture:sv <0x3b7c02a5>
-			streams:  54, words: 126410
+		worklib.testfixture:sv <0x527d0cbb>
+			streams:  54, words: 125379
+		worklib.u_ifu:sv <0x20458daa>
+			streams:  13, words:  4269
 	Building instance specific data structures.
 	Loading native compiled code:     .................... Done
 	Design hierarchy summary:
 		                  Instances  Unique
 		Modules:                 10      10
-		Registers:              241     241
+		Registers:              242     242
 		Scalar wires:            86       -
 		Vectored wires:          86       -
-		Always blocks:           27      27
+		Always blocks:           29      29
 		Initial blocks:          10      10
 		Parallel blocks:          3       3
 		Cont. assignments:        1       1
@@ -47,28 +49,28 @@ ncsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009
 *Verdi* Loading libsscore_ius152.so
 ncsim> source /usr/cad/cadence/INCISIV/cur/tools/inca/files/ncsimrc
 ncsim> run
-cyc 14840,pc 00000750,ins 0012e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
-cyc 14841,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
-cyc 14842,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
-cyc 14843,pc 00000750,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld01]
-cyc 14844,pc 00000754,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi1 i_ALU0 F0 E0 CSR0 FnoD0 vld11]
-cyc 14845,pc 00000758,ins 0082e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR1 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld11]
-cyc 14846,pc 00000738,ins 00000317,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld10]
-cyc 14847,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
-cyc 14848,pc 0000073c,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
-cyc 14849,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
-cyc 14850,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
-cyc 14851,pc 0000073c,ins 0042e293,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
-cyc 14852,pc 00000740,ins 0042e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld00]
-cyc 14853,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
-cyc 14854,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld01]
-cyc 14855,pc 00000740,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld01]
-cyc 14856,pc 00000744,ins 00430367,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi1 i_ALU0 F0 E0 CSR0 FnoD0 vld11]
-cyc 14857,pc 00000748,ins 0102e293,ifu_vld 1,[LUI0 AUIPC0 JAL0 JALR1 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld11]
-cyc 14858,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD1 vld10]
-cyc 14859,pc 00000738,ins 00430367,ifu_vld 0,[LUI0 AUIPC0 JAL0 JALR0 B0 LD0 ST0 ALUi0 i_ALU0 F0 E0 CSR0 FnoD0 vld00]
+cyc 14831,pc 00000730,ins 02030313,ifu[vld 1 ins 00000317],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
+cyc 14832,pc 00000734,ins 00030367,ifu[vld 1 ins 02030313],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
+cyc 14833,pc 00000738,ins 0012e293,ifu[vld 1 ins 00030367],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
+cyc 14834,pc 0000073c,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf010 hf110 hs0000]
+cyc 14835,pc 00000748,ins 0042e293,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf100 hf010 hs0000]
+cyc 14836,pc 0000074c,ins 00430367,ifu[vld 0 ins 0042e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14837,pc 0000074c,ins 0012e293,ifu[vld 0 ins 0042e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14838,pc 0000074c,ins 0012e293,ifu[vld 0 ins 0042e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14839,pc 0000074c,ins 0012e293,ifu[vld 0 ins 0042e293],[JAL0 JALR0 B0 LD0 ST0 hibf100 hf010 hs0000]
+cyc 14840,pc 00000750,ins 0012e293,ifu[vld 1 ins 0012e293],[JAL0 JALR0 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14841,pc 00000750,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR0 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14842,pc 00000750,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR0 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14843,pc 00000750,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
+cyc 14844,pc 00000754,ins 00430367,ifu[vld 1 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
+cyc 14845,pc 00000758,ins 0082e293,ifu[vld 1 ins 00430367],[JAL0 JALR1 B0 LD0 ST0 hibf011 hf111 hs1100]
+cyc 14846,pc 00000738,ins 00000317,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14847,pc 00000738,ins 00430367,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf100 hf010 hs0000]
+cyc 14848,pc 0000073c,ins 00430367,ifu[vld 0 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14849,pc 0000073c,ins 0042e293,ifu[vld 0 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14850,pc 0000073c,ins 0042e293,ifu[vld 0 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
 The dog is coming, shutdown
 Simulation complete via $finish(1) at time 300 US + 0
-../rtl/testfixture.sv:582   $finish;
+../rtl/testfixture.sv:586   $finish;
 ncsim> exit
-TOOL:	ncverilog	15.20-s084: Exiting on May 03, 2022 at 08:30:20 CST  (total: 00:00:04)
+TOOL:	ncverilog	15.20-s084: Exiting on May 04, 2022 at 08:35:42 CST  (total: 00:00:01)

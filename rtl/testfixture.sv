@@ -145,19 +145,28 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14847-8) @(posedge clk) begin
+  repeat(14838-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin
     #1;
-//    $display("cycle %d, pc: %h, ifu_ins: %h, reg_iAUIPC: %b, exe_buf0_we: %b, rf_rd_e: %b",
-//              i, core0.u_ifu0.pc, core0.ifu_ins, core0.u_exe0.reg_iAUIPC, core0.u_exe0.buf0_we, core0.u_rf0.rd_e);
-//    $display("cycle %d, pc: %h, ifu_ins: %h, imm: %h, reg_iAUIPC: %b, alu_i1: %h, alu_i2: %h, alu_o: %h ",
-//              i, core0.u_ifu0.pc, core0.ifu_ins, core0.imm, core0.u_exe0.p1_iAUIPC, core0.alu_i1, core0.alu_i2, core0.alu_o);
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,iALUi %d,[b0_we %d b0_d %h],s2 %d,[b2_we %d b2_d %h]", 
-//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iALUi, 
-//              core0.u_exe0.buf0_we, core0.u_exe0.buf0_d, core0.u_hz0.hzs_ex2, 
-//              core0.u_exe0.buf2_we, core0.u_exe0.buf2_d);
+    // check opcode
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+//              core0.u_exe0.p1_iLUI,
+//              core0.u_exe0.p1_iAUIPC,
+//              core0.u_exe0.p1_iJAL,
+//              core0.u_exe0.p1_iJALR,
+//              core0.u_exe0.p1_iB,
+//              core0.u_exe0.p1_iLD,
+//              core0.u_exe0.p1_iST,
+//              core0.u_exe0.p1_iALUi,
+//              core0.u_exe0.p1_iALU,
+//              core0.u_exe0.p1_iF,
+//              core0.u_exe0.p1_iE,
+//              core0.u_exe0.p1_iCSR,
+//              core0.fwd_no_dat,
+//              m_vld[4:3]);
     // branch 
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
@@ -170,23 +179,18 @@ initial begin: monitor_core
 //              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
 //              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
-    // check opcode
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-              core0.u_exe0.p1_iLUI,
-              core0.u_exe0.p1_iAUIPC,
+    // check hazard
+    $display("cyc %d,pc %h,ins %h,ifu[vld %d ins %h],[JAL%b JALR%b B%b LD%b ST%b hibf%b hf%b hs%b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, 
+              core0.ifu_vld, core0.ifu_ins,
               core0.u_exe0.p1_iJAL,
               core0.u_exe0.p1_iJALR,
               core0.u_exe0.p1_iB,
               core0.u_exe0.p1_iLD,
               core0.u_exe0.p1_iST,
-              core0.u_exe0.p1_iALUi,
-              core0.u_exe0.p1_iALU,
-              core0.u_exe0.p1_iF,
-              core0.u_exe0.p1_iE,
-              core0.u_exe0.p1_iCSR,
-              core0.fwd_no_dat,
-              m_vld[4:3]);
+              {!core0.ifu_vld, core0.branch, core0.fwd_no_dat},
+              {core0.hzf_ifu, core0.hzf_ex0, core0.hzf_ex1},
+              {core0.hzs_ifu, core0.hzs_ex0, core0.hzs_ex1, core0.hzs_ex2});
     i=i+1;
   end
 end

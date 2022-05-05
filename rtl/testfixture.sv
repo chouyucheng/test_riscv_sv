@@ -145,7 +145,7 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14838-8) @(posedge clk) begin
+  repeat(14840-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin

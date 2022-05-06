@@ -1,5 +1,5 @@
 ncverilog(64): 15.20-s084: (c) Copyright 1995-2020 Cadence Design Systems, Inc.
-TOOL:	ncverilog	15.20-s084: Started on May 04, 2022 at 21:03:38 CST
+TOOL:	ncverilog	15.20-s084: Started on May 05, 2022 at 21:51:12 CST
 ncverilog
 	-f filelist.f
 		../rtl/testfixture.sv
@@ -14,19 +14,21 @@ ncverilog
 		../rtl/u_alu.sv
 	+nc64bit
 	+access+r
-Recompiling... reason: file '../rtl/testfixture.sv' is newer than expected.
-	expected: Wed May  4 08:06:43 2022
-	actual:   Wed May  4 21:03:33 2022
-file: ../rtl/testfixture.sv
-	module worklib.testfixture:sv
+Recompiling... reason: file '../rtl/u_exe.sv' is newer than expected.
+	expected: Wed Apr 13 21:52:13 2022
+	actual:   Thu May  5 21:50:54 2022
+file: ../rtl/u_exe.sv
+	module worklib.u_exe:sv
 		errors: 0, warnings: 0
 		Caching library 'worklib' ....... Done
 	Elaborating the design hierarchy:
 ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.testfixture:sv <0x3c9dedd5>
+		worklib.testfixture:sv <0x6e2a94cc>
 			streams:  54, words: 125379
+		worklib.u_exe:sv <0x332d7cdd>
+			streams:  41, words: 27285
 	Building instance specific data structures.
 	Loading native compiled code:     .................... Done
 	Design hierarchy summary:
@@ -60,15 +62,16 @@ cyc 14842,pc 00000750,ins 0012e293,ifu[vld 1 ins 00430367],[JAL0 JALR0 B0 LD0 ST
 cyc 14843,pc 00000750,ins 00430367,ifu[vld 1 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf001 hf001 hs1100]
 cyc 14844,pc 00000750,ins 00430367,ifu[vld 1 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf001 hf001 hs1100]
 cyc 14845,pc 00000750,ins 00430367,ifu[vld 1 ins 00430367],[JAL0 JALR0 B0 LD0 ST0 hibf000 hf000 hs0000]
-cyc 14846,pc 00000754,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf011 hf111 hs1100]
-cyc 14847,pc 00000738,ins 0082e293,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
-cyc 14848,pc 00000738,ins 00430367,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
-cyc 14849,pc 00000738,ins 00430367,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf100 hf010 hs0000]
-cyc 14850,pc 0000073c,ins 00430367,ifu[vld 0 ins 0082e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
-cyc 14851,pc 0000073c,ins 0042e293,ifu[vld 0 ins 0082e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
+cyc 14846,pc 00000754,ins 00430367,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14847,pc 00000754,ins 0082e293,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14848,pc 00000754,ins 0082e293,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf001 hf001 hs1100]
+cyc 14849,pc 00000754,ins 0082e293,ifu[vld 1 ins 0012e293],[JAL0 JALR1 B0 LD0 ST0 hibf010 hf110 hs0000]
+cyc 14850,pc 00000738,ins 0082e293,ifu[vld 0 ins 00000000],[JAL0 JALR0 B0 LD0 ST0 hibf100 hf010 hs0000]
+cyc 14851,pc 0000073c,ins 00430367,ifu[vld 0 ins 0082e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
 cyc 14852,pc 0000073c,ins 0042e293,ifu[vld 0 ins 0082e293],[JAL0 JALR0 B0 LD0 ST0 hibf101 hf011 hs1100]
-The dog is coming, shutdown
-Simulation complete via $finish(1) at time 300 US + 0
-../rtl/testfixture.sv:586   $finish;
+sram1 adr0 cnt:15124
+dump_sram break
+Simulation complete via $finish(1) at time 153016 NS + 0
+../rtl/testfixture.sv:136   $finish; 
 ncsim> exit
-TOOL:	ncverilog	15.20-s084: Exiting on May 04, 2022 at 21:03:40 CST  (total: 00:00:02)
+TOOL:	ncverilog	15.20-s084: Exiting on May 05, 2022 at 21:51:14 CST  (total: 00:00:02)

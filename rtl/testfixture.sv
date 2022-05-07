@@ -145,7 +145,7 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(14840-8) @(posedge clk) begin
+  repeat(15184-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin
@@ -175,12 +175,16 @@ initial begin: monitor_core
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
     // store word
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iST %d,f1 %h,f2 %h],[lsu_a %h,lsu_wd %h]",
-//              i, core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iST,
+//    $display("cyc %d,pc %h,ins %h,[ifu_vld%d rf rs2a rs2o a2 %h %h %h],[iST %d,f12 %h %h,rs2o%h],[lsu a wd %h %h]",
+//              i, core0.u_ifu0.pc, core0.ins, 
+//              core0.ifu_vld, 
+//              core0.u_rf0.rs2_a, core0.u_rf0.rs2_o, core0.u_rf0.rf_arr[12],
+//              core0.u_exe0.p1_iST,
 //              core0.u_exe0.fwd_o1, core0.u_exe0.fwd_o2, 
+//              core0.u_exe0.p1_rs2_o,
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check hazard
-    $display("cyc %d,pc %h,ins %h,ifu[vld %d ins %h],[JAL%b JALR%b B%b LD%b ST%b hibf%b hf%b hs%b]",
+    $display("cyc %d,pc %h,ins %h,ifu[vld %d ins %h],[JAL%b JALR%b B%b LD%b ST%b hibf%b hf%b hs%b],[bfwe %b bfa0-2 %h %h %h]",
               i[15:0], core0.u_ifu0.pc, core0.ins, 
               core0.ifu_vld, core0.ifu_ins,
               core0.u_exe0.p1_iJAL,
@@ -190,7 +194,12 @@ initial begin: monitor_core
               core0.u_exe0.p1_iST,
               {!core0.ifu_vld, core0.branch, core0.fwd_no_dat},
               {core0.hzf_ifu, core0.hzf_ex0, core0.hzf_ex1},
-              {core0.hzs_ifu, core0.hzs_ex0, core0.hzs_ex1, core0.hzs_ex2});
+              {core0.hzs_ifu, core0.hzs_ex0, core0.hzs_ex1, core0.hzs_ex2},
+              {core0.u_exe0.buf0_we, core0.u_exe0.buf1_we, core0.u_exe0.buf2_we},
+              core0.u_exe0.buf0_a,
+              core0.u_exe0.buf1_a,
+              core0.u_exe0.buf2_a
+              );
     i=i+1;
   end
 end

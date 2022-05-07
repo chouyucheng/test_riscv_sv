@@ -19,8 +19,8 @@ always_ff@(posedge clk) begin: writhe_data
 end
 
 always_comb begin: forwarding_and_read_data
-  rs1_o = (rs1_a==rd_a) ? rd_i : rf_arr[rs1_a];
-  rs2_o = (rs2_a==rd_a) ? rd_i : rf_arr[rs2_a];
+  rs1_o = (rd_e & rd_a==rs1_a) ? rd_i : rf_arr[rs1_a];
+  rs2_o = (rd_e & rd_a==rs2_a) ? rd_i : rf_arr[rs2_a];
 end
 
 endmodule

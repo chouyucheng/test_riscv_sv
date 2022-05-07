@@ -137,6 +137,9 @@ always_ff@(posedge clk or negedge rstn) begin: p1_reg_input
     p1_iF        <= 0; 
     p1_iE        <= 0; 
     p1_iCSR      <= 0; 
+    p1_rs1_a     <= 0;
+    p1_rs2_a_sht <= 0;
+    p1_rd_a      <= 0;
   end else if(!stall0) begin
     p1_pc        <= pc;
     p1_iLUI      <= i_LUI;

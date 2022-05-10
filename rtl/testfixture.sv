@@ -145,28 +145,28 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(15184-8) @(posedge clk) begin
+  repeat(15190-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin
     #1;
     // check opcode
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
-//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-//              core0.u_exe0.p1_iLUI,
-//              core0.u_exe0.p1_iAUIPC,
-//              core0.u_exe0.p1_iJAL,
-//              core0.u_exe0.p1_iJALR,
-//              core0.u_exe0.p1_iB,
-//              core0.u_exe0.p1_iLD,
-//              core0.u_exe0.p1_iST,
-//              core0.u_exe0.p1_iALUi,
-//              core0.u_exe0.p1_iALU,
-//              core0.u_exe0.p1_iF,
-//              core0.u_exe0.p1_iE,
-//              core0.u_exe0.p1_iCSR,
-//              core0.fwd_no_dat,
-//              m_vld[4:3]);
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+              core0.u_exe0.p1_iLUI,
+              core0.u_exe0.p1_iAUIPC,
+              core0.u_exe0.p1_iJAL,
+              core0.u_exe0.p1_iJALR,
+              core0.u_exe0.p1_iB,
+              core0.u_exe0.p1_iLD,
+              core0.u_exe0.p1_iST,
+              core0.u_exe0.p1_iALUi,
+              core0.u_exe0.p1_iALU,
+              core0.u_exe0.p1_iF,
+              core0.u_exe0.p1_iE,
+              core0.u_exe0.p1_iCSR,
+              core0.fwd_no_dat,
+              m_vld[4:3]);
     // branch 
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
@@ -184,22 +184,22 @@ initial begin: monitor_core
 //              core0.u_exe0.p1_rs2_o,
 //              core0.u_exe0.lsu_a,  core0.u_exe0.lsu_wd); 
     // check hazard
-    $display("cyc %d,pc %h,ins %h,ifu[vld %d ins %h],[JAL%b JALR%b B%b LD%b ST%b hibf%b hf%b hs%b],[bfwe %b bfa0-2 %h %h %h]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, 
-              core0.ifu_vld, core0.ifu_ins,
-              core0.u_exe0.p1_iJAL,
-              core0.u_exe0.p1_iJALR,
-              core0.u_exe0.p1_iB,
-              core0.u_exe0.p1_iLD,
-              core0.u_exe0.p1_iST,
-              {!core0.ifu_vld, core0.branch, core0.fwd_no_dat},
-              {core0.hzf_ifu, core0.hzf_ex0, core0.hzf_ex1},
-              {core0.hzs_ifu, core0.hzs_ex0, core0.hzs_ex1, core0.hzs_ex2},
-              {core0.u_exe0.buf0_we, core0.u_exe0.buf1_we, core0.u_exe0.buf2_we},
-              core0.u_exe0.buf0_a,
-              core0.u_exe0.buf1_a,
-              core0.u_exe0.buf2_a
-              );
+//    $display("cyc %d,pc %h,ins %h,ifu[vld %d ins %h],[JAL%b JALR%b B%b LD%b ST%b hibf%b hf%b hs%b],[bfwe %b bfa0-2 %h %h %h]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, 
+//              core0.ifu_vld, core0.ifu_ins,
+//              core0.u_exe0.p1_iJAL,
+//              core0.u_exe0.p1_iJALR,
+//              core0.u_exe0.p1_iB,
+//              core0.u_exe0.p1_iLD,
+//              core0.u_exe0.p1_iST,
+//              {!core0.ifu_vld, core0.branch, core0.fwd_no_dat},
+//              {core0.hzf_ifu, core0.hzf_ex0, core0.hzf_ex1},
+//              {core0.hzs_ifu, core0.hzs_ex0, core0.hzs_ex1, core0.hzs_ex2},
+//              {core0.u_exe0.buf0_we, core0.u_exe0.buf1_we, core0.u_exe0.buf2_we},
+//              core0.u_exe0.buf0_a,
+//              core0.u_exe0.buf1_a,
+//              core0.u_exe0.buf2_a
+//              );
     i=i+1;
   end
 end
@@ -220,7 +220,7 @@ initial begin: dump_sram
 
   forever @(posedge clk) begin
     #1;
-    if(cnt==14468-2) fwrite_sram1(cnt, fn1);
+    //if(cnt==14468-2) fwrite_sram1(cnt, fn1);
     if(fflag==1)     fwrite_sram1(cnt, fn1);
     if(fflag==1) break;
     if(sram1[0]==32'hfffff004 && flag==0) begin
@@ -359,8 +359,8 @@ initial begin: monitor_instruction
       ins3 <= core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe4_exe
-      vld4     <= core0.branch | (!core0.hzf_ex1 & vld3);
-      m_vld[4] <= core0.branch | (!core0.hzf_ex1 & vld3);
+      vld4     <= (core0.branch & !core0.fwd_no_dat) | (!core0.hzf_ex1 & vld3);
+      m_vld[4] <= (core0.branch & !core0.fwd_no_dat) | (!core0.hzf_ex1 & vld3);
       pc4  <= pc3;
       ins4 <= ins3;
     end

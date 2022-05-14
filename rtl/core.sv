@@ -2,11 +2,11 @@ module core(
 input clk,
 input rstn,
 // sram0 instrusction
-output  [15:0] ins_a,
+output  [31:0] ins_a,
 output         ins_e,
 input   [31:0] ins,
 // sram1 data
-output [15:0]  dat_a,
+output [31:0]  dat_a,
 output [3:0]   dat_we,
 output [31:0]  dat_wd,
 output [3:0]   dat_re,

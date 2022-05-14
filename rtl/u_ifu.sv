@@ -12,7 +12,7 @@ output logic        ifu_vld,
 output logic [31:0] ifu_pc,
 output logic [31:0] ifu_ins,
 // sram 0
-output logic [15:0] ins_a,
+output logic [31:0] ins_a,
 output              ins_e,
 input        [31:0] ins
 );
@@ -33,7 +33,7 @@ end
 
 assign ins_e = 1;
 always_comb begin: pipe0_ctrl_ins_mem
-  ins_a = pc[15:0];
+  ins_a = pc;
 end
 
 always_ff@(posedge clk or negedge rstn) begin: pipe1_reg

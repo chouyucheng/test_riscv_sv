@@ -8,27 +8,27 @@ module testfixture;
 
 logic clk;
 logic rstn;
+// sram model
 logic [ 7:0] sram0_0 [0:(2**14)-1];
 logic [ 7:0] sram0_1 [0:(2**14)-1];
 logic [ 7:0] sram0_2 [0:(2**14)-1];
 logic [ 7:0] sram0_3 [0:(2**14)-1];
 logic [31:0] sram0   [0:(2**14)-1];
-logic [13:0] sram0_a;
-logic        sram0_e;
-logic [31:0] sram0_o;
+logic [31:0] sram1   [0:(2**14)-1];
 
-logic [31:0] sram1 [0:(2**14)-1];
-logic [13:0] sram1_a;
-logic [ 3:0] sram1_we;
-logic [31:0] sram1_wd;
-logic [ 3:0] sram1_re;
-logic [31:0] sram1_rd;
+logic [14:0] ins_d1_a;
+logic        ins_d1_e;
+logic [31:0] ins_d1_o;
+logic [14:0] dat_d1_a;
+logic [ 3:0] dat_d1_we;
+logic [31:0] dat_d1_wd;
+logic [ 3:0] dat_d1_re;
 
 // core
-logic [15:0] ins_a;
+logic [31:0] ins_a;
 logic        ins_e;
 logic [31:0] ins;
-logic [15:0] dat_a;
+logic [31:0] dat_a;
 logic [3:0]  dat_we;
 logic [31:0] dat_wd;
 logic [3:0]  dat_re;
@@ -45,7 +45,7 @@ initial begin: reset
   @(posedge clk) #1 rstn = 1;
 end
 
-initial begin: sram0_model
+initial begin: R2W1_sram0_sram1_model
   integer i;
   // init
   $readmemh("../../test_compile/prog0/sram_0_0.hex", sram0_0);
@@ -58,49 +58,108 @@ initial begin: sram0_model
     sram0[i][16+:8] = sram0_2[i];
     sram0[i][24+:8] = sram0_3[i];
   end
-  ins = 0;
 
   @(posedge rstn) fork
     forever@(posedge clk) begin
-      sram0_a <= ins_a[13+2:2];
-      sram0_e <= ins_e;
+      ins_d1_a <= ins_a[16:2];
+      ins_d1_e <= ins_e;
     end
-    forever@(*) begin
-      if(sram0_e) sram0_o = sram0[sram0_a];
-      ins = sram0_o;
+    forever@(*) begin: read_instruction
+      if(!ins_d1_a[14] & ins_d1_e) ins = sram0[ins_d1_a[13:0]];
+      if( ins_d1_a[14] & ins_d1_e) ins = sram1[ins_d1_a[13:0]];
+    end
+    forever@(posedge clk) begin
+      dat_d1_a  <= dat_a[16:2];
+      dat_d1_we <= dat_we;
+      dat_d1_wd <= dat_wd;
+      dat_d1_re <= dat_re;
+    end
+    forever@(*) begin: read_data
+      dat_rd = 0;
+      if(!dat_d1_a[14]) begin
+        if(dat_d1_re[0]) dat_rd[ 0+:8] = sram0[dat_d1_a[13:0]][ 0+:8];
+        if(dat_d1_re[1]) dat_rd[ 8+:8] = sram0[dat_d1_a[13:0]][ 8+:8];
+        if(dat_d1_re[2]) dat_rd[16+:8] = sram0[dat_d1_a[13:0]][16+:8];
+        if(dat_d1_re[3]) dat_rd[24+:8] = sram0[dat_d1_a[13:0]][24+:8];
+      end else begin
+        if(dat_d1_re[0]) dat_rd[ 0+:8] = sram1[dat_d1_a[13:0]][ 0+:8];
+        if(dat_d1_re[1]) dat_rd[ 8+:8] = sram1[dat_d1_a[13:0]][ 8+:8];
+        if(dat_d1_re[2]) dat_rd[16+:8] = sram1[dat_d1_a[13:0]][16+:8];
+        if(dat_d1_re[3]) dat_rd[24+:8] = sram1[dat_d1_a[13:0]][24+:8];
+      end
+    end
+    forever@(*) begin: write_data
+      if(!dat_d1_a[14]) begin
+        if(dat_d1_we[0]) sram0[dat_d1_a[13:0]][ 0+:8] = dat_d1_wd[ 0+:8];
+        if(dat_d1_we[1]) sram0[dat_d1_a[13:0]][ 8+:8] = dat_d1_wd[ 8+:8];
+        if(dat_d1_we[2]) sram0[dat_d1_a[13:0]][16+:8] = dat_d1_wd[16+:8];
+        if(dat_d1_we[3]) sram0[dat_d1_a[13:0]][24+:8] = dat_d1_wd[24+:8];
+      end else begin                                                 
+        if(dat_d1_we[0]) sram1[dat_d1_a[13:0]][ 0+:8] = dat_d1_wd[ 0+:8];
+        if(dat_d1_we[1]) sram1[dat_d1_a[13:0]][ 8+:8] = dat_d1_wd[ 8+:8];
+        if(dat_d1_we[2]) sram1[dat_d1_a[13:0]][16+:8] = dat_d1_wd[16+:8];
+        if(dat_d1_we[3]) sram1[dat_d1_a[13:0]][24+:8] = dat_d1_wd[24+:8];
+      end
     end
   join
 end
 
-initial begin: sram1_model
-  // init
-  integer i;
-  //for (i=0;i<65536;i=i+1) sram1[i] = 0;
-  sram1_we = 0;
-
-  @(posedge rstn) fork
-    forever@(posedge clk) begin
-      sram1_a  <= dat_a[13+2:2];
-      sram1_we <= dat_we;
-      sram1_wd <= dat_wd;
-      sram1_re <= dat_re;
-    end
-    forever@(*) begin: write_sram1
-      if(sram1_we[0]) sram1[sram1_a][ 0+:8] = sram1_wd[ 0+:8];
-      if(sram1_we[1]) sram1[sram1_a][ 8+:8] = sram1_wd[ 8+:8];
-      if(sram1_we[2]) sram1[sram1_a][16+:8] = sram1_wd[16+:8];
-      if(sram1_we[3]) sram1[sram1_a][24+:8] = sram1_wd[24+:8];
-    end
-    forever@(*) begin: read_sram1
-      if(sram1_re[0]) sram1_rd[ 0+:8] = sram1[sram1_a][ 0+:8];
-      if(sram1_re[1]) sram1_rd[ 8+:8] = sram1[sram1_a][ 8+:8];
-      if(sram1_re[2]) sram1_rd[16+:8] = sram1[sram1_a][16+:8];
-      if(sram1_re[3]) sram1_rd[24+:8] = sram1[sram1_a][24+:8];
-      dat_rd = sram1_rd;
-    end
-  join
-  //for (i=0;i<10;i=i+1) $display("%h", sram0[i]);
-end
+//initial begin: sram0_model
+//  integer i;
+//  // init
+//  $readmemh("../../test_compile/prog0/sram_0_0.hex", sram0_0);
+//  $readmemh("../../test_compile/prog0/sram_0_1.hex", sram0_1);
+//  $readmemh("../../test_compile/prog0/sram_0_2.hex", sram0_2);
+//  $readmemh("../../test_compile/prog0/sram_0_3.hex", sram0_3);
+//  for(i=0;i<2**14;i=i+1) begin
+//    sram0[i][ 0+:8] = sram0_0[i];
+//    sram0[i][ 8+:8] = sram0_1[i];
+//    sram0[i][16+:8] = sram0_2[i];
+//    sram0[i][24+:8] = sram0_3[i];
+//  end
+//  ins = 0;
+//
+//  @(posedge rstn) fork
+//    forever@(posedge clk) begin
+//      sram0_a <= ins_a[13+2:2];
+//      sram0_e <= ins_e;
+//    end
+//    forever@(*) begin
+//      if(sram0_e) sram0_o = sram0[sram0_a];
+//      ins = sram0_o;
+//    end
+//  join
+//end
+//
+//initial begin: sram1_model
+//  // init
+//  integer i;
+//  //for (i=0;i<65536;i=i+1) sram1[i] = 0;
+//  sram1_we = 0;
+//
+//  @(posedge rstn) fork
+//    forever@(posedge clk) begin
+//      sram1_a  <= dat_a[13+2:2];
+//      sram1_we <= dat_we;
+//      sram1_wd <= dat_wd;
+//      sram1_re <= dat_re;
+//    end
+//    forever@(*) begin: write_sram1
+//      if(sram1_we[0]) sram1[sram1_a][ 0+:8] = sram1_wd[ 0+:8];
+//      if(sram1_we[1]) sram1[sram1_a][ 8+:8] = sram1_wd[ 8+:8];
+//      if(sram1_we[2]) sram1[sram1_a][16+:8] = sram1_wd[16+:8];
+//      if(sram1_we[3]) sram1[sram1_a][24+:8] = sram1_wd[24+:8];
+//    end
+//    forever@(*) begin: read_sram1
+//      if(sram1_re[0]) sram1_rd[ 0+:8] = sram1[sram1_a][ 0+:8];
+//      if(sram1_re[1]) sram1_rd[ 8+:8] = sram1[sram1_a][ 8+:8];
+//      if(sram1_re[2]) sram1_rd[16+:8] = sram1[sram1_a][16+:8];
+//      if(sram1_re[3]) sram1_rd[24+:8] = sram1[sram1_a][24+:8];
+//      dat_rd = sram1_rd;
+//    end
+//  join
+//  //for (i=0;i<10;i=i+1) $display("%h", sram0[i]);
+//end
 
 core core0(
 .clk    (clk   ),
@@ -137,6 +196,7 @@ initial begin: finish_prog
 end
 
 integer m_vld;
+integer m_ins4;
 `ifdef MONITOR_ON
 initial begin: monitor_core
   integer i;
@@ -145,35 +205,40 @@ initial begin: monitor_core
 
   #1;
   @(posedge rstn);
-  repeat(15190-8) @(posedge clk) begin
+  repeat(15210-8) @(posedge clk) begin
     i = i + 1;
   end
   repeat(20) @(posedge clk) begin
     #1;
     // check opcode
-    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b]",
-              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
-              core0.u_exe0.p1_iLUI,
-              core0.u_exe0.p1_iAUIPC,
-              core0.u_exe0.p1_iJAL,
-              core0.u_exe0.p1_iJALR,
-              core0.u_exe0.p1_iB,
-              core0.u_exe0.p1_iLD,
-              core0.u_exe0.p1_iST,
-              core0.u_exe0.p1_iALUi,
-              core0.u_exe0.p1_iALU,
-              core0.u_exe0.p1_iF,
-              core0.u_exe0.p1_iE,
-              core0.u_exe0.p1_iCSR,
-              core0.fwd_no_dat,
-              m_vld[4:3]);
+//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[LUI%b AUIPC%b JAL%b JALR%b B%b LD%b ST%b ALUi%b i_ALU%b F%b E%b CSR%b FnoD%b vld%b ins4%h]",
+//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
+//              core0.u_exe0.p1_iLUI,
+//              core0.u_exe0.p1_iAUIPC,
+//              core0.u_exe0.p1_iJAL,
+//              core0.u_exe0.p1_iJALR,
+//              core0.u_exe0.p1_iB,
+//              core0.u_exe0.p1_iLD,
+//              core0.u_exe0.p1_iST,
+//              core0.u_exe0.p1_iALUi,
+//              core0.u_exe0.p1_iALU,
+//              core0.u_exe0.p1_iF,
+//              core0.u_exe0.p1_iE,
+//              core0.u_exe0.p1_iCSR,
+//              core0.fwd_no_dat,
+//              m_vld[4:3],
+//              m_ins4);
     // branch 
 //    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[B%b f3b%b]",
 //              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld,
 //              core0.u_exe0.p1_iB, core0.u_exe0.p1_f3);
     // load word
-//    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b]",
-//              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3);
+    $display("cyc %d,pc %h,ins %h,ifu_vld %d,[iLD %d,f3 %b,hibf%b],lsu_a%h,lsu_rd%h",
+              i[15:0], core0.u_ifu0.pc, core0.ins, core0.ifu_vld, core0.u_exe0.p1_iLD, core0.u_exe0.p1_f3,
+              {!core0.ifu_vld, core0.branch, core0.fwd_no_dat},
+              core0.u_exe0.lsu_a,
+              {dat_d1_a,2'b0}//core0.u_exe0.lsu_rd
+              );
     // store word
 //    $display("cyc %d,pc %h,ins %h,[ifu_vld%d rf rs2a rs2o a2 %h %h %h],[iST %d,f12 %h %h,rs2o%h],[lsu a wd %h %h]",
 //              i, core0.u_ifu0.pc, core0.ins, 
@@ -355,14 +420,17 @@ initial begin: monitor_instruction
     forever @(posedge clk) begin: pipe3_ins_reg_out
       vld3     <= !core0.hzf_ex0;
       m_vld[3] <= !core0.hzf_ex0;
-      pc3  <= core0.ifu_pc;
-      ins3 <= core0.ifu_ins;
+      pc3  <= core0.hzs_ex0 ? pc3  : core0.ifu_pc; 
+      ins3 <= core0.hzs_ex0 ? ins3 : core0.ifu_ins;
     end
     forever @(posedge clk) begin: pipe4_exe
-      vld4     <= (core0.branch & !core0.fwd_no_dat) | (!core0.hzf_ex1 & vld3);
-      m_vld[4] <= (core0.branch & !core0.fwd_no_dat) | (!core0.hzf_ex1 & vld3);
-      pc4  <= pc3;
-      ins4 <= ins3;
+      vld4     <= (core0.hzf_ex1 & core0.branch ) ? 1 : 
+                  (core0.hzf_ex1 | core0.hzs_ex1) ? 0 : vld3;
+      m_vld[4] <= (core0.hzf_ex1 & core0.branch ) ? 1 : 
+                  (core0.hzf_ex1 | core0.hzs_ex1) ? 0 : vld3;
+      pc4    <= core0.hzs_ex1 ? pc4  : pc3;
+      ins4   <= core0.hzs_ex1 ? ins4 : ins3;
+      m_ins4 <= core0.hzs_ex1 ? ins4 : ins3;
     end
     forever @(posedge clk) begin: pipe5_csr
       vld5 <= vld4;
@@ -481,14 +549,14 @@ input [31:0] rd
     fw_reg_name(fn, rd_a);
     fw_reg_name(fn, rs1_a);
     $fwrite(fn, "0x%h, ", iimm);
-    $fwrite(fn, "sram1\[0x%h\]=>0x%h", adr, rd);
+    $fwrite(fn, "mem\[0x%h\]=>0x%h", adr, rd);
   end
   if(opcode==7'b0100011) begin
     if(funct3==3'b010) $fwrite(fn, "SW,    ");
     fw_reg_name(fn, rs2_a_shamt);
     fw_reg_name(fn, rs1_a);
     $fwrite(fn, "0x%h, ", simm);
-    $fwrite(fn, "sram1\[0x%h\]<=0x%h", adr, wd);
+    $fwrite(fn, "mem\[0x%h\]<=0x%h", adr, wd);
   end
   if(opcode==7'b0010011) begin
     if(funct3==3'b000) $fwrite(fn, "ADDI,  ");

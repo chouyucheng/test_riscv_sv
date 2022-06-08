@@ -1,44 +1,57 @@
 SHELL := /bin/bash
 
-PROG_DIR := $(PWD)/code/prog0
+ifndef MF
+export TOPDIR := $(PWD)
+export PROG   := $(PROG)
+export ASM    := $(ASM)
 
-.PHONY: all load_prog make_in_build gen_elf
+.PHONY: help build clean
 
-all: | load_prog make_in_build 
+help:
+	@echo "serval is the best!!!"
 
-load_prog: 
-	rm -rf build/*
-	ln -sf $(PWD)/Makefile build
-	ln -sf $(PROG_DIR) .
-	cp $(PROG_DIR)/* build
+build:
+	@ \
+	cd build; \
+	if   [ "$(PROG)" != "" ]; then make gen_elf MF=prog -f $(TOPDIR)/Makefile; \
+	elif [ "$(ASM)"  != "" ]; then make gen_elf MF=asm  -f $(TOPDIR)/Makefile; \
+	fi
 
-make_in_build:
-	make gen_elf IN_BUILD=1 -C build
+clean:
+	rm -rf $(TOPDIR)/build/*
 
-ifdef IN_BUILD
-  CROSS_PREFIX ?= riscv64-unknown-elf-
-  RISCV_GCC    ?= $(CROSS_PREFIX)gcc
-
-  ELF_NAME := main
-  LDFILE   := link.ld
-  CFLAGS   := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 #-I$(INCDIR)
-  LDFLAGS  := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 -T$(LDFILE) -lgcc
-
-  SRC_C   := $(wildcard *.c)
-  OBJ_C   := $(patsubst %.c,%.o,$(SRC_C))
-  SRC_S   := $(wildcard *.S)
-  OBJ_S   := $(patsubst %.S,%.o,$(SRC_S))
-  BMP     := $(wildcard *.bmp)
-  OBJ_BMP := $(patsubst %.bmp,%.o,$(BMP))
-  SRC     := $(SRC_C) $(SRC_S)
-  OBJ     := $(OBJ_C) $(OBJ_S) $(OBJ_BMP)
 endif
+
+ifeq ($(MF), prog)
+DIR    := $(TOPDIR)/code/prog$(PROG)
+CSRC   := $(wildcard $(DIR)/*.c)
+SSRC   := $(wildcard $(DIR)/*.S)
+OBJ     = $(notdir $(patsubst %c, %o, $(CSRC)))
+OBJ    += $(notdir $(patsubst %S, %o, $(SSRC)))
+LDFILE := $(DIR)/link.ld
+endif
+	
+ifeq ($(MF), asm)
+endif
+
+ifdef MF
+CROSS_PREFIX ?= riscv64-unknown-elf-
+RISCV_GCC    ?= $(CROSS_PREFIX)gcc
+
+ELF_NAME := main
+CFLAGS   := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 #-I$(INCDIR)
+LDFLAGS  := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 -T$(LDFILE) -lgcc
+
+.PHONY: gen_elf
 
 gen_elf: $(OBJ) | $(LDFILE)
 	$(RISCV_GCC) $^ $(LDFLAGS) -o $(ELF_NAME)
 
-%.o: %.S
+%.o: $(DIR)/%.c
 	$(RISCV_GCC) -c $(CFLAGS) $^
 
-%.o: %.c
+%.o: $(DIR)/%.S
 	$(RISCV_GCC) -c $(CFLAGS) $^
+
+endif
+

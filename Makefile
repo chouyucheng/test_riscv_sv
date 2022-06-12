@@ -13,8 +13,8 @@ help:
 build:
 	@ \
 	cd build; \
-	if   [ "$(PROG)" != "" ]; then make gen_elf MF=prog -f $(TOPDIR)/Makefile; \
-	elif [ "$(ASM)"  != "" ]; then make gen_elf MF=asm  -f $(TOPDIR)/Makefile; \
+	if   [ "$(PROG)" != "" ]; then make gen_hex MF=prog -f $(TOPDIR)/Makefile; \
+	elif [ "$(ASM)"  != "" ]; then make         MF=asm  -f $(TOPDIR)/Makefile; \
 	fi
 
 clean:
@@ -35,16 +35,34 @@ ifeq ($(MF), asm)
 endif
 
 ifdef MF
-CROSS_PREFIX ?= riscv64-unknown-elf-
-RISCV_GCC    ?= $(CROSS_PREFIX)gcc
+CROSS_PREFIX  ?= riscv64-unknown-elf-
+RISCV_GCC     ?= $(CROSS_PREFIX)gcc
+RISCV_OBJCOPY ?= $(CROSS_PREFIX)objcopy -O verilog
+RISCV_OBJDUMP ?= $(CROSS_PREFIX)objdump -xsd
 
 ELF_NAME := main
 CFLAGS   := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 #-I$(INCDIR)
 LDFLAGS  := -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -march=rv32i -mabi=ilp32 -T$(LDFILE) -lgcc
 
-.PHONY: gen_elf
+.PHONY: help gen_hex gen_log
 
-gen_elf: $(OBJ) | $(LDFILE)
+help:
+	@echo "MF = $(MF), serval is the best!!!"
+
+gen_hex: $(ELF_NAME)
+	$(RISCV_OBJCOPY) $< -i 4 -b 0 sram_0_0.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 1 sram_0_1.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 2 sram_0_2.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 3 sram_0_3.hex
+
+gen_log: $(ELF_NAME)
+	$(RISCV_OBJDUMP) $< > $(ELF_NAME).log
+
+#DRAM_START="0x80000000"
+#${RISCV_OBJCOPY} $1 -i 4 -b 0 --change-addresses -${DRAM_START} ddr_0.hex
+
+ifeq ($(MF), prog)
+$(ELF_NAME): $(OBJ) | $(LDFILE)
 	$(RISCV_GCC) $^ $(LDFLAGS) -o $(ELF_NAME)
 
 %.o: $(DIR)/%.c
@@ -52,6 +70,6 @@ gen_elf: $(OBJ) | $(LDFILE)
 
 %.o: $(DIR)/%.S
 	$(RISCV_GCC) -c $(CFLAGS) $^
-
-endif
+endif #ifeq ($(MF), prog)
+endif #ifedf MF
 

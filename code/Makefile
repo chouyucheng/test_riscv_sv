@@ -37,7 +37,6 @@ build_hex: $(ELF_NAME)
 	$(RISCV_OBJCOPY) $< -i 4 -b 1 sram_0_1.hex
 	$(RISCV_OBJCOPY) $< -i 4 -b 2 sram_0_2.hex
 	$(RISCV_OBJCOPY) $< -i 4 -b 3 sram_0_3.hex
-	$(RISCV_OBJCOPY) $< --reverse-bytes=4 --verilog-data-width 4 sram_0.hex
 
 %.o: %.bmp
 	$(RISCV_OBJCOPY) -I binary -O elf32-littleriscv -B riscv:rv32 $^ $@

@@ -30,13 +30,14 @@ build_elf: $(OBJ) | $(LDFILE)
 	$(RISCV_GCC) $^ $(LDFLAGS) -o $(ELF_NAME)
 
 build_log: $(ELF_NAME)
-	$(RISCV_OBJDUMP) $< > $(ELF_NAME).log
+	$(RISCV_OBJDUMP) $< > head.log
+#	$(RISCV_OBJDUMP) $< > $(ELF_NAME).log
 
 build_hex: $(ELF_NAME)
-	$(RISCV_OBJCOPY) $< -i 4 -b 0 sram_0_0.hex
-	$(RISCV_OBJCOPY) $< -i 4 -b 1 sram_0_1.hex
-	$(RISCV_OBJCOPY) $< -i 4 -b 2 sram_0_2.hex
-	$(RISCV_OBJCOPY) $< -i 4 -b 3 sram_0_3.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 0 head_0.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 1 head_1.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 2 head_2.hex
+	$(RISCV_OBJCOPY) $< -i 4 -b 3 head_3.hex
 #	$(RISCV_OBJCOPY) $< --reverse-bytes=4 --verilog-data-width 4 sram_0.hex
 
 %.o: %.bmp
